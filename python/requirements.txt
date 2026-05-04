@@ -1,0 +1,16 @@
+# Core Python
+numpy==1.26.4
+scipy>=1.10.0
+
+# Computer Vision and AI
+opencv-python>=4.7
+torch>=2.0.0
+torchvision>=0.15.0
+ultralytics>=8.0
+matplotlib>=3.3.0
+
+# Pupil Labs
+pupil-labs-realtime-api>=1.8.0
+
+# Communication and Utils
+websockets>=11.0

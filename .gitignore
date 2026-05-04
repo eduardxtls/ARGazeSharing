@@ -1,0 +1,8 @@
+# Root .gitignore
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+*.pt
+*.mp4

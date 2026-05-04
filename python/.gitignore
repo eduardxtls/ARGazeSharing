@@ -1,0 +1,71 @@
+# Python gitignore
+### --- Machine Learning & Vision (YOLO/Ultralytics) ---
+# Don't track large model weights or training logs
+*.pt
+*.onnx
+*.engine
+*.weights
+runs/
+.ultralytics/
+models/
+
+### --- Eye Tracking & Research Data ---
+# Ignore raw recordings and data exports to keep repo clean
+# (Common formats for Pupil Labs recordings)
+*.mp4
+*.mkv
+*.avi
+*.csv
+*.json
+data/raw/
+data/processed/
+
+### --- Python Template ---
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments & Dependencies
+.venv/
+venv/
+ENV/
+env/
+.env
+*.egg-info/
+.installed.cfg
+*.egg
+lib/
+lib64/
+
+# Distribution / Packaging
+build/
+dist/
+downloads/
+sdist/
+var/
+bin/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+### --- macOS / Windows System Files ---
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+desktop.ini
+
+### --- IDEs & Editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+.project
+.pydevproject
+.settings/
