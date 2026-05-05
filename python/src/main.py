@@ -2,7 +2,7 @@ import cv2
 import time
 from datetime import datetime
 from ultralytics import YOLO
-# from ultralytics import YOLOWorld
+from pupil_labs.realtime_api import FixationOnsetEventData, FixationEventData
 
 # Internal imports
 from gaze.pupil_client import PupilClient
@@ -12,21 +12,14 @@ from fusion.gaze_object_fusion import GazeObjectFusion
 from spatial.aruco_tracker import ArucoTracker
 from networking.udp_sender import UDPSender
 
-from pupil_labs.realtime_api import FixationOnsetEventData, FixationEventData
-
-MODE = "live"  # Options: "live", "replay"
+# Mode selection: "live" for real-time streaming or "replay" for recordings
+MODE = "live"
 
 def main():
     # Vision model selection
-    # model = YOLO(r"D:\Masterarbeit\Seeing-Through-Others-Eyes\python_backend\models\food.pt")
-    model = YOLO(".\python_backend\models\yolo26n.pt")
+    model = YOLO(".\python\models\yolo26n.pt")
 
-    # model.train(data=r"C:\Users\talos\Downloads\FOOD-INGREDIENTS dataset.v1i.yolov11\data.yaml", epochs=50, imgsz=640)
-
-    # World model for custom classes (doesn't work really well..)
-    # model = YOLOWorld("yolov8s-world.pt")
-    # model.set_classes(["banana", "apple", "tomato", "onion", "cucumber", "strawberry", "lemon", "egg", "lettuce", "bread", "toast", "ham", "salami"])
-
+    # Object recognition parameters
     AI_UPDATE_INTERVAL = 0.2
     last_ai_update_time = 0
 

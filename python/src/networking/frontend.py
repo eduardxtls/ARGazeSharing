@@ -4,14 +4,14 @@ from nicegui import ui
 
 # --- UDP Configuration ---
 UNITY_IP = "127.0.0.1" 
-UNITY_PORT = 5005
+UNITY_PORT = 8080
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 def send_update(param_type, value):
     """Sends a JSON string via UDP to Unity."""
     data = {
         "type": "design",
-        "param": param_type,
+        "parameter": param_type,
         "value": value
     }
     message = json.dumps(data)
@@ -60,4 +60,4 @@ with ui.column().classes('w-full items-center p-8 gap-6'):
         ui.slider(min=0, max=1, step=0.25, value=1.0, 
                   on_change=lambda e: send_update("alpha", e.value)).props('label-always color=slate-400 markers')
 
-ui.run(title="Control Panel", port=8080, dark=True)
+ui.run(title="Visual Cue Control Panel", port=UNITY_PORT, dark=True)
