@@ -27,7 +27,7 @@ public class CueManager : MonoBehaviour
 
         SetDesign(currentDesign);
         SetColor("#32cd32");
-        SetAlpha("0.75");
+        SetAlpha("0.25");
         SetVisibility(true);
     }
 
