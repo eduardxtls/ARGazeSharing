@@ -133,6 +133,12 @@ public class NewCustomObjectDetectionVisualizer : MonoBehaviour
         // Iterate through each detection box in the batch
         foreach (var b in batch)
         {
+            // Ignore persons
+            if (b.label.Contains("person"))
+            {
+                continue;
+            }
+
             // Fetch its position and scale to define bounding box
             var xmin = b.position.x;
             var ymin = b.position.y;

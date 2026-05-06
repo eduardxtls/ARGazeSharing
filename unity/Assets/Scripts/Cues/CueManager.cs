@@ -3,9 +3,12 @@ using UnityEngine;
 
 public class CueManager : MonoBehaviour
 {
-    [Header("Settings")]
+    [Header("Smoothness Settings")]
     public float outlineSmooth = 0.05f;
     public float overlaySmooth = 0.1f;
+
+    [Header("Default Design")]
+    public string currentDesign = "outline";
 
     public GameObject overlayCue;
     public GameObject outlineCue;
@@ -13,16 +16,18 @@ public class CueManager : MonoBehaviour
     private Renderer overlayRenderer;
     private Renderer outlineRenderer;
 
-    private string currentDesign = "none";
     private Vector3 outlineVelocity = Vector3.zero;
     private Vector3 overlayVelocity = Vector3.zero;
+
 
     private void Awake()
     {
         if (overlayCue) overlayRenderer = overlayCue.GetComponent<Renderer>();
         if (outlineCue) outlineRenderer = outlineCue.GetComponent<Renderer>();
 
-        SetDesign("outline");
+        SetDesign(currentDesign);
+        SetColor("#32cd32");
+        SetAlpha("0.75");
         SetVisibility(true);
     }
 

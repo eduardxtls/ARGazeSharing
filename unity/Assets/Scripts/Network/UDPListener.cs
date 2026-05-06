@@ -20,8 +20,7 @@ public class UDPListener : MonoBehaviour
     private bool running = false;
     private ConcurrentQueue<string> messageQueue = new ConcurrentQueue<string>();
 
-    // private string latestLabel = string.Empty;
-    private string latestLabel = "keyboard";
+    private string latestLabel = "monitor";
 
     // Handlers for spatial and design change messages
     private Dictionary<string, Action<string>> messageHandlers;
