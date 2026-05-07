@@ -26,19 +26,19 @@ def main():
     if MODE == "live":
         client = PupilClient()
         client.connect()
+        udp_bridge = UDPSender(ip="127.0.0.1", port=8080)
         # Aruco parameters
         tracker = ArucoTracker(client.get_calibration(), marker_length=0.1)
         rvec, tvec = None, None
         ARUCO_UPDATE_INTERVAL = 0.25
         last_aruco_update_time = 0
-        udp_bridge = UDPSender(ip="127.0.0.1", port=8080)
     else:
         video_path = r"C:\Users\talos\Downloads\02_Belisarius Brown\02_Belisarius Brown\2024-03-13_19-43-27-92efb037\5ab15f0b_0.0-389.913.mp4"
         gaze_csv_path = r"C:\Users\talos\Downloads\02_Belisarius Brown\02_Belisarius Brown\2024-03-13_19-43-27-92efb037\gaze.csv"
 
         client = ReplayPupilClient(video_path, gaze_csv_path)
-        tracker = None
         udp_bridge = None
+        tracker = None
 
     # Instantiate core components
     detector = ObjectDetector(model)
@@ -53,7 +53,7 @@ def main():
     last_write_time = time.time()
     last_frame = None
 
-    # Fixations
+    # Fixations and current detections
     is_fixating = False
     detections = []
     selected_object = None
@@ -108,6 +108,7 @@ def main():
                     color = (0, 200, 0)  # Green for focused
                     rel_pos_cm = [0.0, 0.0, 0.0]
 
+                    # For segmentation models, mask is available
                     if mask is not None:
                         # Mask as overlay
                         mask_overlay = frame.copy()
@@ -119,6 +120,7 @@ def main():
                         cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
                     cv2.putText(frame, f"Looking at: {label}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
 
+                    # Estimation of gaze coordinates in code space
                     if rvec is not None and tvec is not None and gaze is not None:
                         _, gazepos = tracker.estimate_object_and_gaze_position(rvec, tvec, gaze)
 
@@ -133,8 +135,7 @@ def main():
 
                             cv2.putText(frame, f"Position of gaze: {rel_pos_cm}", (x1, y1 - 35), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
-
-                    # Color of object
+                    # Color within bounding box -- inaccurate in most cases
                     # bgr_object = detector.get_box_color(frame, detection)
                     # color = detector.get_color_name_hsv(bgr_object)
 
@@ -183,7 +184,6 @@ def main():
                 recording_text = "Recording ..." if is_recording else "Press R to start recording."
                 recording_color = (0, 0, 255) if is_recording else (255, 255, 255)
                 cv2.putText(frame, recording_text, (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.7, recording_color, 2)
-
             cv2.imshow("Gaze + Object Detection", frame)
 
             # Input: Start/stop recording and quit

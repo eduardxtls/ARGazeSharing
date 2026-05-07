@@ -1,12 +1,10 @@
 import cv2
-import os
 from datetime import datetime
 from ultralytics import YOLO
 
 # Internal imports
 from gaze.pupil_client import PupilClient
 from gaze.pupil_client import ReplayPupilClient
-from gaze.gaze_mapper import GazeMapper
 from vision.detector import ObjectDetector
 from fusion.gaze_object_fusion import GazeObjectFusion
 from spatial.aruco_tracker import ArucoTracker
@@ -30,7 +28,6 @@ def main():
     # Fetch camera intrinsics
     camera_matrix, dist_coeffs = client.get_calibration()
 
-    gaze_mapper = GazeMapper()
     detector = ObjectDetector(model)
     fusion = GazeObjectFusion()
 

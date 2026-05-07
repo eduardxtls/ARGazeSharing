@@ -11,6 +11,7 @@ class ArucoTracker:
         self.parameters = cv2.aruco.DetectorParameters()
         self.detector = cv2.aruco.ArucoDetector(self.dictionary, self.parameters)
 
+        # Corner points of marker
         self.obj_points = np.array([
             [-marker_length / 2, marker_length / 2,  0],
             [marker_length / 2,  marker_length / 2,  0],

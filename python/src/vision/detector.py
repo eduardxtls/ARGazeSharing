@@ -11,8 +11,8 @@ class ObjectDetector:
         Detects objects in the given frame
         Returns: list of detected objects with their bounding boxes
         """
+        
         results = self.model(frame, verbose=False)[0]
-
         detections = []
 
         for result in results:
@@ -92,14 +92,15 @@ class ObjectDetector:
         """
         Converts a color into a readable name
         """
-        
+
         color_pixel = np.uint8([[bgr_color]])
 
+        # Pixel is not in BGR format
         if color_pixel.shape[2] != 3:
-            return "Problem"
+            return "Error"
 
+        # HSV values and threshold computations to define colors
         hsv_pixel = cv.cvtColor(color_pixel, cv.COLOR_BGR2HSV)[0][0]
-
         h, s, v = hsv_pixel
 
         if s < 20:
@@ -116,4 +117,4 @@ class ObjectDetector:
         if 85 <= h < 130:       return "Blue"
         if 130 <= h < 160:      return "Purple"
 
-        return "Gray"
+        return "Gray" # Fallback for undefined colors
