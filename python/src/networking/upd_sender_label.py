@@ -16,6 +16,7 @@ while True:
         break
 
     message = {
+        "type": "detection",
         "label": label
     }
 
