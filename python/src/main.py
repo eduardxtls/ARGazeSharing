@@ -17,7 +17,7 @@ MODE = "live"
 
 def main():
     # Vision model selection
-    model = YOLO(".\python\models\yolo26n.pt")
+    model = YOLO(".\python\models\yolo12n.pt")
 
     # Object recognition parameters
     AI_UPDATE_INTERVAL = 0.2
@@ -26,9 +26,10 @@ def main():
     if MODE == "live":
         client = PupilClient()
         client.connect()
-        udp_bridge = UDPSender(ip="127.0.0.1", port=8080)
+        udp_bridge = UDPSender(ip="10.100.172.159", port=8080)
         # Aruco parameters
-        tracker = ArucoTracker(client.get_calibration(), marker_length=0.1)
+        # tracker = ArucoTracker(client.get_calibration(), marker_length=0.1)
+        tracker = None
         rvec, tvec = None, None
         ARUCO_UPDATE_INTERVAL = 0.25
         last_aruco_update_time = 0
@@ -101,6 +102,11 @@ def main():
             for detection in detections:
                 x1, y1, x2, y2 = detection["bbox"]
                 label = detection["label"]
+
+                # No person detection
+                if label == "person":
+                    break
+
                 mask = detection.get("mask")
                 is_focused = (selected_object is not None and detection == selected_object)
 
@@ -165,7 +171,7 @@ def main():
                 cv2.circle(frame, center, 5, (0, 255, 0), -1)
 
             # Aruco axes
-            if rvec is not None:
+            if tracker is not None and rvec is not None:
                 tracker.draw_marker_axes(frame, rvec, tvec)
 
             # Video saving workaround for frame (not regular sometimes)
