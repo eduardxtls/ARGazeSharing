@@ -12,8 +12,18 @@ from fusion.gaze_object_fusion import GazeObjectFusion
 from spatial.aruco_tracker import ArucoTracker
 from networking.udp_sender import UDPSender
 
-# Mode selection: "live" for real-time streaming or "replay" for recordings
+# Modes selection:
+# "live" for real-time streaming or "replay" for recordings
 MODE = "live"
+
+# "selective" for dwell filter and "continuous" for constant feedback
+# In selective mode, feedback is provided only after a given fixation threshold
+FEEDBACK = "selective" 
+DWELL_THRESHOLD = 3.0
+
+# Aruco tracking toggle
+ARUCO = False
+
 
 def main():
     # Vision model selection
@@ -26,17 +36,20 @@ def main():
     if MODE == "live":
         client = PupilClient()
         client.connect()
-        udp_bridge = UDPSender(ip="10.100.172.159", port=8080)
-        # Aruco parameters
-        # tracker = ArucoTracker(client.get_calibration(), marker_length=0.1)
-        tracker = None
-        rvec, tvec = None, None
-        ARUCO_UPDATE_INTERVAL = 0.25
-        last_aruco_update_time = 0
-    else:
-        video_path = r"C:\Users\talos\Downloads\02_Belisarius Brown\02_Belisarius Brown\2024-03-13_19-43-27-92efb037\5ab15f0b_0.0-389.913.mp4"
-        gaze_csv_path = r"C:\Users\talos\Downloads\02_Belisarius Brown\02_Belisarius Brown\2024-03-13_19-43-27-92efb037\gaze.csv"
+        udp_bridge = UDPSender(ip="127.0.0.1", port=8080)
 
+        # Aruco parameters
+        if ARUCO:
+            tracker = ArucoTracker(client.get_calibration(), marker_length=0.1)
+            rvec, tvec = None, None
+            ARUCO_UPDATE_INTERVAL = 0.25
+            last_aruco_update_time = 0
+        else:
+            tracker = None
+
+    else:
+        video_path = r"" # Local path to video
+        gaze_csv_path = r""
         client = ReplayPupilClient(video_path, gaze_csv_path)
         udp_bridge = None
         tracker = None
@@ -59,6 +72,11 @@ def main():
     detections = []
     selected_object = None
 
+    # Dwell filter variables
+    current_focused_label = None
+    dwell_start_time = None
+    dwell_triggered = False
+
     try:
         for data in client.stream():
             frame = data["frame"]
@@ -73,15 +91,22 @@ def main():
                 video_writer = cv2.VideoWriter(filename, fourcc, target_fps, (w, h))
                 print(f"Started local video recording: {filename}")
 
-            # Tracking marker
-            if current_time - last_aruco_update_time > ARUCO_UPDATE_INTERVAL and tracker is not None:
-                pose = tracker.estimate_pose(frame)
-                if pose is not None:
-                    rvec, tvec = pose
-                    last_aruco_update_time = current_time
-                else:
-                    pass
+            # Tracking the marker
+            if ARUCO and tracker is not None:
+                if current_time - last_aruco_update_time > ARUCO_UPDATE_INTERVAL:
+                    pose = tracker.estimate_pose(frame)
+                    # Update only if pose estimation was successful (no occlusion etc.)
+                    if pose is not None:
+                        rvec, tvec = pose
+                        last_aruco_update_time = current_time
 
+            # PL Invisible
+            '''
+            if MODE == "live":
+                is_fixating = True
+            '''
+
+            # PL Neon
             if MODE == "live":
                 event = client.device.receive_eye_events(0.0)
                 if isinstance(event, FixationOnsetEventData):
@@ -98,6 +123,25 @@ def main():
                 selected_object = fusion.find_looked_at_object(gaze, detections)
                 last_ai_update_time = current_time
 
+            # Dwell filter
+            if selected_object is not None:
+                new_label = selected_object["label"]
+
+                if new_label != current_focused_label:
+                    current_focused_label = new_label
+                    dwell_start_time = current_time
+                    dwell_triggered = False
+                else:
+                    elapsed_dwell_time = current_time - dwell_start_time
+                    if elapsed_dwell_time >= DWELL_THRESHOLD:
+                        print(f"Dwell triggered on {current_focused_label} after {elapsed_dwell_time:.1f} seconds.")
+                        dwell_triggered = True
+            else:
+                # No object selected --> reset
+                current_focused_label = None
+                dwell_start_time = None
+                dwell_triggered = False
+
             # Draw detections
             for detection in detections:
                 x1, y1, x2, y2 = detection["bbox"]
@@ -106,9 +150,17 @@ def main():
                 # No person detection
                 if label == "person":
                     break
-
+                
+                # If segmentation model is used, mask is available -- otherwise returns None
                 mask = detection.get("mask")
-                is_focused = (selected_object is not None and detection == selected_object)
+
+                is_looking_at_this = (selected_object is not None and detection == selected_object)
+
+                # Set focus based on feedback mode
+                if FEEDBACK == "selective":
+                    is_focused = is_looking_at_this and dwell_triggered
+                else:
+                    is_focused = is_looking_at_this
 
                 if is_focused:
                     color = (0, 200, 0)  # Green for focused
@@ -124,6 +176,7 @@ def main():
                     else:
                         # Bounding box
                         cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+
                     cv2.putText(frame, f"Looking at: {label}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
 
                     # Estimation of gaze coordinates in code space
@@ -143,17 +196,17 @@ def main():
 
                     # Color within bounding box -- inaccurate in most cases
                     # bgr_object = detector.get_box_color(frame, detection)
-                    # color = detector.get_color_name_hsv(bgr_object)
+                    # color_name = detector.get_color_name_hsv(bgr_object)
 
                     # Color around gaze point
                     gaze_color = detector.get_gaze_color(frame, gaze)
-                    color = detector.get_color_name_hsv(gaze_color)
+                    color_name = detector.get_color_name_hsv(gaze_color)
 
                     # Send UDP data
                     if udp_bridge is not None:
                         udp_bridge.send_spatial_data(
                             label=label,
-                            color=color,
+                            color=color_name,
                             position=rel_pos_cm,
                             tvec=tvec,
                             rvec=rvec,
@@ -164,6 +217,11 @@ def main():
                     color = (100, 0, 0)  # Blue for non-focused
                     cv2.rectangle(frame, (x1, y1), (x2, y2), color, 1)
                     cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 1)
+
+                    # Dwell progress bar for "selective" feedback
+                    if FEEDBACK == "selective":
+                        progress = min((current_time - dwell_start_time) / DWELL_THRESHOLD, 1.0)
+                        cv2.rectangle(frame, (x1, y2 + 5), (x1 + int((x2 - x1) * progress), y2), (0, 165, 255), -1)
 
             # Visualization of gaze point
             if gaze:
