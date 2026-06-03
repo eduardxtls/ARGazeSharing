@@ -18,7 +18,7 @@ MODE = "live"
 
 # "selective" for dwell filter and "continuous" for constant feedback
 # In selective mode, feedback is provided only after a given fixation threshold
-FEEDBACK = "selective" 
+FEEDBACK = "continuous" 
 DWELL_THRESHOLD = 3.0
 
 # Aruco tracking toggle
@@ -134,7 +134,8 @@ def main():
                 else:
                     elapsed_dwell_time = current_time - dwell_start_time
                     if elapsed_dwell_time >= DWELL_THRESHOLD:
-                        print(f"Dwell triggered on {current_focused_label} after {elapsed_dwell_time:.1f} seconds.")
+                        if not dwell_triggered:
+                            print(f"Dwell triggered on {current_focused_label} after {elapsed_dwell_time:.1f} seconds.")
                         dwell_triggered = True
             else:
                 # No object selected --> reset
@@ -180,19 +181,20 @@ def main():
                     cv2.putText(frame, f"Looking at: {label}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
 
                     # Estimation of gaze coordinates in code space
-                    if rvec is not None and tvec is not None and gaze is not None:
-                        _, gazepos = tracker.estimate_object_and_gaze_position(rvec, tvec, gaze)
+                    if tracker is not None:
+                        if rvec is not None and tvec is not None and gaze is not None:
+                            _, gazepos = tracker.estimate_object_and_gaze_position(rvec, tvec, gaze)
 
-                        if gazepos is not None:
-                            gx, gy, gz = gazepos.flatten()
-                            
-                            rel_pos_cm = [
-                                int(gx * 1000) / 10.0,
-                                int(gy * 1000) / 10.0,
-                                int(gz * 1000) / 10.0
-                            ]
+                            if gazepos is not None:
+                                gx, gy, gz = gazepos.flatten()
 
-                            cv2.putText(frame, f"Position of gaze: {rel_pos_cm}", (x1, y1 - 35), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+                                rel_pos_cm = [
+                                    int(gx * 1000) / 10.0,
+                                    int(gy * 1000) / 10.0,
+                                    int(gz * 1000) / 10.0
+                                ]
+
+                                cv2.putText(frame, f"Position of gaze: {rel_pos_cm}", (x1, y1 - 35), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
                     # Color within bounding box -- inaccurate in most cases
                     # bgr_object = detector.get_box_color(frame, detection)
@@ -207,9 +209,9 @@ def main():
                         udp_bridge.send_spatial_data(
                             label=label,
                             color=color_name,
-                            position=rel_pos_cm,
-                            tvec=tvec,
-                            rvec=rvec,
+                            position=rel_pos_cm if tracker is not None else None,
+                            tvec=tvec if tracker is not None else None,
+                            rvec=rvec if tracker is not None else None,
                             gaze_point=gaze
                         )
 
@@ -218,10 +220,11 @@ def main():
                     cv2.rectangle(frame, (x1, y1), (x2, y2), color, 1)
                     cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 1)
 
-                    # Dwell progress bar for "selective" feedback
-                    if FEEDBACK == "selective":
-                        progress = min((current_time - dwell_start_time) / DWELL_THRESHOLD, 1.0)
-                        cv2.rectangle(frame, (x1, y2 + 5), (x1 + int((x2 - x1) * progress), y2), (0, 165, 255), -1)
+                
+                # Dwell progress bar for "selective" feedback
+                if FEEDBACK == "selective" and is_looking_at_this and not dwell_triggered and dwell_start_time is not None:
+                    progress = min((current_time - dwell_start_time) / DWELL_THRESHOLD, 1.0)
+                    cv2.rectangle(frame, (x1, y2 + 5), (x1 + int((x2 - x1) * progress), y2), (0, 165, 255), -1)
 
             # Visualization of gaze point
             if gaze:
