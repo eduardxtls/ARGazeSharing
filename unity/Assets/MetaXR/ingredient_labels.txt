@@ -1,0 +1,9 @@
+bread
+salad
+tomato
+salami
+ham
+egg
+cheese
+cucumber
+burger

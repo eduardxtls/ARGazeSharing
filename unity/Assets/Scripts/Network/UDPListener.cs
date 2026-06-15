@@ -14,13 +14,14 @@ public class UDPListener : MonoBehaviour
 
     [Header("References")]
     public CueManager cueManager;
+    public AudioSource audioSource;
 
     private UdpClient client;
     private Thread receiveThread;
     private bool running = false;
     private ConcurrentQueue<string> messageQueue = new ConcurrentQueue<string>();
 
-    private string latestLabel = "monitor";
+    private string latestLabel = "salami";
 
     // Handlers for spatial and design change messages
     private Dictionary<string, Action<string>> messageHandlers;
@@ -116,6 +117,7 @@ public class UDPListener : MonoBehaviour
             latestLabel = message.label;
             Debug.Log($"Detection - Label: {message.label}");
         }
+        audioSource.Play();
     }
 
     public string GetLatestLabel()
