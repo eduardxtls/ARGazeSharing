@@ -3,63 +3,6 @@ using UnityEngine;
 [ExecuteAlways]
 public class CueManager : MonoBehaviour
 {
-    // ==========================================
-    // EDITOR INCOMING MESSAGE SIMULATORS
-    // Right-click the CueManager component in the Inspector to try these!
-    // ==========================================
-
-    [ContextMenu("Simulate Message: Size -> Huge")]
-    private void TestMessageSizeHuge()
-    {
-        Debug.Log("--- Simulating Network Message: SetSize('huge') ---");
-        SetSize("huge");
-        // Force the layout engine to refresh the changes visually
-        UpdateCueTransform(transform.position, transform.rotation, simulatedScale);
-    }
-
-    [ContextMenu("Simulate Message: Size -> Small")]
-    private void TestMessageSizeSmall()
-    {
-        Debug.Log("--- Simulating Network Message: SetSize('small') ---");
-        SetSize("small");
-        UpdateCueTransform(transform.position, transform.rotation, simulatedScale);
-    }
-
-    [ContextMenu("Simulate Message: Color -> Bright Cyan")]
-    private void TestMessageColorCyan()
-    {
-        Debug.Log("--- Simulating Network Message: SetColor('#00FFFF') ---");
-        SetColor("#00FFFF");
-    }
-
-    [ContextMenu("Simulate Message: Alpha -> 30%")]
-    private void TestMessageAlphaLow()
-    {
-        Debug.Log("--- Simulating Network Message: SetAlpha('0.3') ---");
-        SetAlpha("0.3");
-    }
-
-    [ContextMenu("Simulate Message: Alpha -> 100%")]
-    private void TestMessageAlphaFull()
-    {
-        Debug.Log("--- Simulating Network Message: SetAlpha('1.0') ---");
-        SetAlpha("1.0");
-    }
-
-    [ContextMenu("Simulate Message: Design -> Overlay")]
-    private void TestMessageDesignOverlay()
-    {
-        Debug.Log("--- Simulating Network Message: SetDesign('overlay') ---");
-        SetDesign("overlay");
-    }
-
-    [ContextMenu("Simulate Message: Design -> Outline")]
-    private void TestMessageDesignOutline()
-    {
-        Debug.Log("--- Simulating Network Message: SetDesign('outline') ---");
-        SetDesign("outline");
-    }
-
     [Header("Editor Simulation")]
     public bool simulateInEditor = false;
     public Vector3 simulatedScale = new Vector3(1f, 1f, 1f);
@@ -86,9 +29,10 @@ public class CueManager : MonoBehaviour
     private Vector3 overlayVelocity = Vector3.zero;
 
     // Outline size settings
-    private float currentThickness = 0.1f;
+    private float currentThickness = 0.01f;
     private Vector2 currentSize = new Vector2(1f, 1f);
 
+    /*
     private void OnValidate()
     {
         CacheMaskingReferences();
@@ -103,6 +47,8 @@ public class CueManager : MonoBehaviour
             ExecuteLayoutUpdates();
         }
     }
+    
+    */
 
     private void Awake()
     {
@@ -131,6 +77,7 @@ public class CueManager : MonoBehaviour
         }
     }
 
+    /*
     private void ExecuteLayoutUpdates()
     {
         if (simulateInEditor)
@@ -144,6 +91,7 @@ public class CueManager : MonoBehaviour
 #endif
         }
     }
+    */
 
     public void ApplyDesign(DesignMessage design)
     {
@@ -212,11 +160,11 @@ public class CueManager : MonoBehaviour
     {
         switch (size.ToLower())
         {
-            case "tiny":    currentThickness = 0.01f; break;
-            case "small":   currentThickness = 0.025f; break;
-            case "medium":  currentThickness = 0.5f; break;
-            case "large":   currentThickness = 0.1f; break;
-            case "huge":    currentThickness = 0.15f; break;
+            case "tiny":    currentThickness = 0.005f; break;
+            case "small":   currentThickness = 0.01f; break;
+            case "medium":  currentThickness = 0.025f; break;
+            case "large":   currentThickness = 0.05f; break;
+            case "huge":    currentThickness = 0.075f; break;
             default:        Debug.Log($"Unknown size value: {size}"); return;
         }
 
@@ -229,7 +177,7 @@ public class CueManager : MonoBehaviour
         {
             newColor.a = outerSpriteRenderer.color.a; // Preserve current alpha - same for both cues
             outerSpriteRenderer.color = newColor;
-            overlayRenderer.material.color = newColor;
+            overlayRenderer.sharedMaterial.color = newColor;
             Debug.Log("Design Change - Color: " + color);
         }
         else
@@ -244,16 +192,16 @@ public class CueManager : MonoBehaviour
         {
             if (outerSpriteRenderer != null)
             {
-                Color color = outerSpriteRenderer.material.color;
+                Color color = outerSpriteRenderer.color;
                 color.a = alphaValue;
-                outerSpriteRenderer.material.color = color;
+                outerSpriteRenderer.color = color;
             }
 
             if (overlayRenderer != null)
             {
-                Color color = overlayRenderer.material.color;
+                Color color = overlayRenderer.sharedMaterial.color;
                 color.a = alphaValue;
-                overlayRenderer.material.color = color;
+                overlayRenderer.sharedMaterial.color = color;
             }
             
             Debug.Log($"Design Change - Alpha: {alpha}");
