@@ -3,15 +3,23 @@ using UnityEngine;
 [ExecuteAlways]
 public class CueManager : MonoBehaviour
 {
-    [Header("Editor Simulation")]
+    [Header("Editor Simulation Settings")]
     public bool simulateInEditor = false;
     public Vector3 simulatedScale = new Vector3(1f, 1f, 1f);
     [Range(0.01f, 1.0f)]
-    public float simulatedThickness = 0.05f; // Set directly in world meters (e.g., 0.05 = 5cm)
+    public float simulatedThickness = 0.1f; // Set directly in world meters (e.g., 0.05 = 5cm)
 
-    [Header("Smoothness Settings")]
+    [Header("Movement Smoothness Settings")]
     public float outlineSmooth = 0.05f;
-    public float overlaySmooth = 0.1f;
+    public float overlaySmooth = 0.05f;
+
+    [Header("Distance-Based Fading Settings")]
+    [Tooltip("Distance at which the cue starts to fade out.")]
+    public float fadeOutDistance = 0.1f;
+    [Tooltip("Distance at which the cue starts to fade out.")]
+    public float fadeInDistance = 0.1f;
+
+    private float _currentMaxAlpha = 1.0f;
 
     [Header("Default Design")]
     public string currentDesign = "outline";
@@ -32,7 +40,7 @@ public class CueManager : MonoBehaviour
     private float currentThickness = 0.01f;
     private Vector2 currentSize = new Vector2(1f, 1f);
 
-    /*
+
     private void OnValidate()
     {
         CacheMaskingReferences();
@@ -47,8 +55,8 @@ public class CueManager : MonoBehaviour
             ExecuteLayoutUpdates();
         }
     }
-    
-    */
+
+
 
     private void Awake()
     {
@@ -77,12 +85,12 @@ public class CueManager : MonoBehaviour
         }
     }
 
-    /*
     private void ExecuteLayoutUpdates()
     {
         if (simulateInEditor)
         {
-            // currentThickness = simulatedThickness;
+            // CHANGE 1: Driving the script thickness variable from the slider value
+            currentThickness = simulatedThickness;
             UpdateCueTransform(transform.position, transform.rotation, simulatedScale);
 
 #if UNITY_EDITOR
@@ -91,7 +99,7 @@ public class CueManager : MonoBehaviour
 #endif
         }
     }
-    */
+
 
     public void ApplyDesign(DesignMessage design)
     {
@@ -108,6 +116,12 @@ public class CueManager : MonoBehaviour
     public void UpdateCueTransform(Vector3 position, Quaternion rotation, Vector3 scale)
     {
         currentSize = new Vector2(scale.x, scale.y);
+
+        Vector3 currentPos = innerTransform != null ? innerTransform.position : Vector3.zero;
+        float distanceToTarget = Vector3.Distance(currentPos, position);
+
+        float alphaPercentage = Mathf.InverseLerp(fadeOutDistance, fadeInDistance, distanceToTarget);
+        SetAlphaValue(alphaPercentage * _currentMaxAlpha);
 
         if (outlineCue)
         {
@@ -141,8 +155,13 @@ public class CueManager : MonoBehaviour
     public void SetVisibility(bool visible)
     {
         // Only currently enabled cue is shown
-        outlineCue.SetActive(visible && currentDesign == "outline");
-        overlayCue.SetActive(visible && currentDesign == "overlay");
+        if (outlineCue) {
+            outlineCue.SetActive(visible && currentDesign == "outline");
+        }
+        if (overlayCue)
+        {
+            overlayCue.SetActive(visible && currentDesign == "overlay");
+        }
     }
 
     // Setters for design parameters
@@ -176,6 +195,7 @@ public class CueManager : MonoBehaviour
         if (UnityEngine.ColorUtility.TryParseHtmlString(color, out Color newColor))
         {
             newColor.a = outerSpriteRenderer.color.a; // Preserve current alpha - same for both cues
+            _currentMaxAlpha = newColor.a;
             outerSpriteRenderer.color = newColor;
             overlayRenderer.sharedMaterial.color = newColor;
             Debug.Log("Design Change - Color: " + color);
@@ -190,6 +210,9 @@ public class CueManager : MonoBehaviour
     {
         if (float.TryParse(alpha, out float alphaValue))
         {
+            _currentMaxAlpha = alphaValue;
+            SetAlphaValue(alphaValue);
+
             if (outerSpriteRenderer != null)
             {
                 Color color = outerSpriteRenderer.color;
@@ -209,6 +232,22 @@ public class CueManager : MonoBehaviour
         else
         {
             Debug.Log($"Invalid alpha value: {alpha}");
+        }
+    }
+
+    public void SetAlphaValue(float alphaValue)
+    {
+        if (outerSpriteRenderer != null)
+        {
+            Color color = outerSpriteRenderer.color;
+            color.a = alphaValue;
+            outerSpriteRenderer.color = color;
+        }
+        if (overlayRenderer != null)
+        {
+            Color color = overlayRenderer.sharedMaterial.color;
+            color.a = alphaValue;
+            overlayRenderer.sharedMaterial.color = color;
         }
     }
 }
