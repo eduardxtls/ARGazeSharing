@@ -90,11 +90,6 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
         ReturnBuffers();
     }
 
-    private void OnDestroy()
-    {
-        ClearAll();
-    }
-
     private void Update()
     {
         if (_hasTarget && cueManager != null && Application.isPlaying)

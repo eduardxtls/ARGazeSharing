@@ -30,6 +30,10 @@ public class CueManager : MonoBehaviour
     public Transform innerTransform;
     public Transform outerTransform;
 
+    [Header("Loss of Tracking Settings")]
+    public float visibilityDecayDelay = 0.5f;
+    private float _decayTimer = 0f;
+
     private Renderer overlayRenderer;
     private SpriteRenderer outerSpriteRenderer;
 
@@ -53,6 +57,17 @@ public class CueManager : MonoBehaviour
         if (!Application.isPlaying && simulateInEditor)
         {
             ExecuteLayoutUpdates();
+        }
+
+        if (_decayTimer > 0f)
+        {
+            _decayTimer -= Time.deltaTime;
+
+            if (_decayTimer <= 0f)
+            {
+                if (outlineCue) outlineCue.SetActive(false);
+                if (overlayCue) overlayCue.SetActive(false);
+            }
         }
     }
 
@@ -154,6 +169,21 @@ public class CueManager : MonoBehaviour
 
     public void SetVisibility(bool visible)
     {
+        if (visible)
+        {
+            _decayTimer = visibilityDecayDelay;
+
+            if (outlineCue)
+            {
+                outlineCue.SetActive(visible && currentDesign == "outline");
+            }
+            if (overlayCue)
+            {
+                overlayCue.SetActive(visible && currentDesign == "overlay");
+            }
+        }
+
+        /*
         // Only currently enabled cue is shown
         if (outlineCue) {
             outlineCue.SetActive(visible && currentDesign == "outline");
@@ -162,6 +192,7 @@ public class CueManager : MonoBehaviour
         {
             overlayCue.SetActive(visible && currentDesign == "overlay");
         }
+        */
     }
 
     // Setters for design parameters
