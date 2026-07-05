@@ -160,7 +160,7 @@ MonoBehaviour:
   outlineCue: {fileID: 1415529420}
   innerTransform: {fileID: 729211414}
   outerTransform: {fileID: 488987148}
-  visibilityDecayDelay: 1
+  visibilityDecayDelay: 0.5
 --- !u!4 &9610382
 Transform:
   m_ObjectHideFlags: 0
@@ -548,7 +548,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: e51af9c1b8277664f94b367cc1b0242b, type: 3}
-  m_Color: {r: 0.19607843, g: 0.8039216, b: 0.19607843, a: 25}
+  m_Color: {r: 0.19607843, g: 0.8039216, b: 0.19607843, a: 0.25}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -961,7 +961,7 @@ Material:
     - _ZWrite: 0
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 0.19607836, g: 0.8039216, b: 0.19607836, a: 25}
+    - _Color: {r: 0.19607836, g: 0.8039216, b: 0.19607836, a: 0.25}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
@@ -1008,10 +1008,8 @@ GameObject:
   - component: {fileID: 922092742}
   - component: {fileID: 922092741}
   - component: {fileID: 922092740}
-  - component: {fileID: 922092739}
   - component: {fileID: 922092738}
   - component: {fileID: 922092737}
-  - component: {fileID: 922092743}
   - component: {fileID: 922092744}
   m_Layer: 0
   m_Name: '[BuildingBlock] Object Detection'
@@ -1048,21 +1046,6 @@ MonoBehaviour:
   _removeHands: 0
   CustomTrackingSpace: {fileID: 0}
   <MaskMeshFilters>k__BackingField: []
---- !u!114 &922092739
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 922092736}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b48c38ab0b17f4243a02271e64b25ccd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  boundingBoxPrefab: {fileID: 8066889808755201971, guid: 46d0b28dd34412b4c90c82205d36db4f, type: 3}
-  showBoundingBoxes: 1
-  labelScale: 0.5
 --- !u!114 &922092740
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1076,7 +1059,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   providerAsset: {fileID: 11400000, guid: 8adcf4fe364fed44aa4a63812347ee46, type: 2}
-  minConfidence: 0.5
+  minConfidence: 0.35
   detectEveryNFrames: 1
   captureMaxResolution: 640
   onDetectionResponseReceived:
@@ -1127,23 +1110,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 266857601}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &922092743
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 922092736}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c75f22916d085743a2da1ef2b9aff5f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CustomObjectDetectionVisualizer
-  udpListener: {fileID: 1206484360}
-  cueManager: {fileID: 9610381}
-  boundingBoxPrefab: {fileID: 8066889808755201971, guid: 46d0b28dd34412b4c90c82205d36db4f, type: 3}
-  showAllDetections: 1
-  labelScale: 0.5
 --- !u!114 &922092744
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1160,6 +1126,7 @@ MonoBehaviour:
   cueManager: {fileID: 9610381}
   boundingBoxPrefab: {fileID: 8066889808755201971, guid: 46d0b28dd34412b4c90c82205d36db4f, type: 3}
   showAllDetections: 0
+  targetTrackingDecay: 0.5
   labelScale: 0.461
 --- !u!1 &1065269199
 GameObject:
@@ -1866,7 +1833,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1914270541
 Transform:
   m_ObjectHideFlags: 0
