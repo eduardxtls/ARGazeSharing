@@ -36,6 +36,10 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
     [Tooltip("Enable or disable bounding box visualization")]
     [SerializeField] private bool showAllDetections = true;
 
+    [Header("Tracking Settings")]
+    [SerializeField] private float targetTrackingDecay = 0.5f;
+    private float _targetLostTimestamp;
+
     private ObjectDetectionAgent _agent;
     private readonly List<GameObject> _live = new();
     private readonly Queue<GameObject> _pool = new();
@@ -92,8 +96,18 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
 
     private void Update()
     {
-        if (_hasTarget && cueManager != null && Application.isPlaying)
+        if (_hasTarget)
         {
+            if (Time.time <= _targetLostTimestamp + targetTrackingDecay)
+            {
+                cueManager.SetVisibility(true);
+            }
+            else if (Time.time > _targetLostTimestamp + targetTrackingDecay) {
+                _hasTarget = false;
+                cueManager.SetVisibility(false);
+                return;
+            }
+
             cueManager.UpdateCueTransform(_targetPosition, _targetRotation, _targetScale);
         }
     }
@@ -153,7 +167,7 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
                 continue;
             }
 
-            bool isTarget = 
+            bool isTarget =
                 !string.IsNullOrEmpty(targetLabel) &&
                 targetLabel != "none" &&
                 b.label.Contains(targetLabel);
@@ -183,6 +197,8 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
                 _targetScale = scl;
 
                 matchFound = true;
+                _hasTarget = true;
+                _targetLostTimestamp = Time.time;
             }
 
             // Only run when all boxes should show
@@ -208,8 +224,10 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
             }
         }
 
-        _hasTarget = matchFound;
-        cueManager.SetVisibility(matchFound);
+        if (matchFound)
+        {
+            cueManager.SetVisibility(true);
+        }
     }
 
     public bool TryProject(float xmin, float ymin, float xmax, float ymax,
