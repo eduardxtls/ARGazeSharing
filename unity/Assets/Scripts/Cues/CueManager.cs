@@ -10,16 +10,7 @@ public class CueManager : MonoBehaviour
     public float simulatedThickness = 0.1f; // Set directly in world meters (e.g., 0.05 = 5cm)
 
     [Header("Movement Smoothness Settings")]
-    public float outlineSmooth = 0.05f;
-    public float overlaySmooth = 0.05f;
-
-    [Header("Distance-Based Fading Settings")]
-    [Tooltip("Distance at which the cue starts to fade out.")]
-    public float fadeOutDistance = 0.1f;
-    [Tooltip("Distance at which the cue starts to fade out.")]
-    public float fadeInDistance = 0.1f;
-
-    private float _currentMaxAlpha = 1.0f;
+    public float cueSmoothSpeed = 18.0f;
 
     [Header("Default Design")]
     public string currentDesign = "outline";
@@ -58,17 +49,6 @@ public class CueManager : MonoBehaviour
         {
             ExecuteLayoutUpdates();
         }
-
-        if (_decayTimer > 0f)
-        {
-            _decayTimer -= Time.deltaTime;
-
-            if (_decayTimer <= 0f)
-            {
-                if (outlineCue) outlineCue.SetActive(false);
-                if (overlayCue) overlayCue.SetActive(false);
-            }
-        }
     }
 
 
@@ -83,7 +63,7 @@ public class CueManager : MonoBehaviour
         // Default initialization
         SetDesign(currentDesign);
         SetColor("#32cd32");
-        SetAlpha("0.25");
+        SetAlpha("0.9");
         SetVisibility(true);
     }
 
@@ -104,7 +84,6 @@ public class CueManager : MonoBehaviour
     {
         if (simulateInEditor)
         {
-            // CHANGE 1: Driving the script thickness variable from the slider value
             currentThickness = simulatedThickness;
             UpdateCueTransform(transform.position, transform.rotation, simulatedScale);
 
@@ -132,17 +111,11 @@ public class CueManager : MonoBehaviour
     {
         currentSize = new Vector2(scale.x, scale.y);
 
-        Vector3 currentPos = innerTransform != null ? innerTransform.position : Vector3.zero;
-        float distanceToTarget = Vector3.Distance(currentPos, position);
-
-        float alphaPercentage = Mathf.InverseLerp(fadeOutDistance, fadeInDistance, distanceToTarget);
-        SetAlphaValue(alphaPercentage * _currentMaxAlpha);
-
         if (outlineCue)
         {
             if (innerTransform != null)
             {
-                innerTransform.position = Application.isPlaying ? Vector3.SmoothDamp(innerTransform.position, position, ref outlineVelocity, outlineSmooth) : position;
+                innerTransform.position = Vector3.Lerp(innerTransform.position, position, Time.deltaTime * cueSmoothSpeed);
                 innerTransform.rotation = rotation;
                 innerTransform.localScale = new Vector3(currentSize.x, currentSize.y, 1f);
             }
@@ -161,7 +134,7 @@ public class CueManager : MonoBehaviour
 
         if (overlayCue)
         {
-            overlayCue.transform.position = Vector3.SmoothDamp(overlayCue.transform.position, position, ref overlayVelocity, overlaySmooth);
+            overlayCue.transform.position = Vector3.Lerp(overlayCue.transform.position, position, Time.deltaTime * cueSmoothSpeed);
             overlayCue.transform.rotation = rotation;
             overlayCue.transform.localScale = scale;
         }
@@ -169,21 +142,6 @@ public class CueManager : MonoBehaviour
 
     public void SetVisibility(bool visible)
     {
-        if (visible)
-        {
-            _decayTimer = visibilityDecayDelay;
-
-            if (outlineCue)
-            {
-                outlineCue.SetActive(visible && currentDesign == "outline");
-            }
-            if (overlayCue)
-            {
-                overlayCue.SetActive(visible && currentDesign == "overlay");
-            }
-        }
-
-        /*
         // Only currently enabled cue is shown
         if (outlineCue) {
             outlineCue.SetActive(visible && currentDesign == "outline");
@@ -192,7 +150,6 @@ public class CueManager : MonoBehaviour
         {
             overlayCue.SetActive(visible && currentDesign == "overlay");
         }
-        */
     }
 
     // Setters for design parameters
@@ -226,7 +183,6 @@ public class CueManager : MonoBehaviour
         if (UnityEngine.ColorUtility.TryParseHtmlString(color, out Color newColor))
         {
             newColor.a = outerSpriteRenderer.color.a; // Preserve current alpha - same for both cues
-            _currentMaxAlpha = newColor.a;
             outerSpriteRenderer.color = newColor;
             overlayRenderer.sharedMaterial.color = newColor;
             Debug.Log("Design Change - Color: " + color);
@@ -241,9 +197,6 @@ public class CueManager : MonoBehaviour
     {
         if (float.TryParse(alpha, out float alphaValue))
         {
-            _currentMaxAlpha = alphaValue;
-            SetAlphaValue(alphaValue);
-
             if (outerSpriteRenderer != null)
             {
                 Color color = outerSpriteRenderer.color;
@@ -263,22 +216,6 @@ public class CueManager : MonoBehaviour
         else
         {
             Debug.Log($"Invalid alpha value: {alpha}");
-        }
-    }
-
-    public void SetAlphaValue(float alphaValue)
-    {
-        if (outerSpriteRenderer != null)
-        {
-            Color color = outerSpriteRenderer.color;
-            color.a = alphaValue;
-            outerSpriteRenderer.color = color;
-        }
-        if (overlayRenderer != null)
-        {
-            Color color = overlayRenderer.sharedMaterial.color;
-            color.a = alphaValue;
-            overlayRenderer.sharedMaterial.color = color;
         }
     }
 }

@@ -101,14 +101,12 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
             if (Time.time <= _targetLostTimestamp + targetTrackingDecay)
             {
                 cueManager.SetVisibility(true);
+                cueManager.UpdateCueTransform(_targetPosition, _targetRotation, _targetScale);
             }
             else if (Time.time > _targetLostTimestamp + targetTrackingDecay) {
                 _hasTarget = false;
                 cueManager.SetVisibility(false);
-                return;
             }
-
-            cueManager.UpdateCueTransform(_targetPosition, _targetRotation, _targetScale);
         }
     }
 
@@ -144,8 +142,6 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
 
     private void HandleBatch(List<BoxData> batch)
     {
-        // Initialize search parameters
-        bool matchFound = false;
         string targetLabel = udpListener != null
             ? udpListener.GetLatestLabel().Trim().ToLower()
             : "";
@@ -177,6 +173,7 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
                 continue;
             }
 
+            /*
             // Fetch its position and scale to define bounding box
             var xmin = b.position.x;
             var ymin = b.position.y;
@@ -188,6 +185,11 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
             {
                 continue;
             }
+            */
+            
+            Vector3 pos = b.position;
+            Quaternion rot = b.rotation;
+            Vector3 scl = b.scale;
 
             // If a target label is specified, check if the current box's label matches it
             if (isTarget)
@@ -196,7 +198,6 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
                 _targetRotation = rot;
                 _targetScale = scl;
 
-                matchFound = true;
                 _hasTarget = true;
                 _targetLostTimestamp = Time.time;
             }
@@ -222,11 +223,6 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
                     uniformScale / Mathf.Max(scl.z, 0.001f)
                 );
             }
-        }
-
-        if (matchFound)
-        {
-            cueManager.SetVisibility(true);
         }
     }
 

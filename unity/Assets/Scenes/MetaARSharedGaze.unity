@@ -151,16 +151,13 @@ MonoBehaviour:
   simulateInEditor: 0
   simulatedScale: {x: 0.1, y: 0.1, z: 1}
   simulatedThickness: 0.195
-  outlineSmooth: 0.2
-  overlaySmooth: 0.2
-  fadeOutDistance: 0.2
-  fadeInDistance: 0.1
-  currentDesign: overlay
+  cueSmoothSpeed: 10
+  currentDesign: outline
   overlayCue: {fileID: 1914270540}
   outlineCue: {fileID: 1415529420}
   innerTransform: {fileID: 729211414}
   outerTransform: {fileID: 488987148}
-  visibilityDecayDelay: 0.5
+  visibilityDecayDelay: 1
 --- !u!4 &9610382
 Transform:
   m_ObjectHideFlags: 0
@@ -548,7 +545,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: e51af9c1b8277664f94b367cc1b0242b, type: 3}
-  m_Color: {r: 0.19607843, g: 0.8039216, b: 0.19607843, a: 0.25}
+  m_Color: {r: 0.19607843, g: 0.8039216, b: 0.19607843, a: 9}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -961,7 +958,7 @@ Material:
     - _ZWrite: 0
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 0.19607836, g: 0.8039216, b: 0.19607836, a: 0.25}
+    - _Color: {r: 0.19607839, g: 0.8039216, b: 0.19607839, a: 9}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
@@ -1059,7 +1056,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   providerAsset: {fileID: 11400000, guid: 8adcf4fe364fed44aa4a63812347ee46, type: 2}
-  minConfidence: 0.35
+  minConfidence: 0.5
   detectEveryNFrames: 1
   captureMaxResolution: 640
   onDetectionResponseReceived:
@@ -1127,7 +1124,7 @@ MonoBehaviour:
   boundingBoxPrefab: {fileID: 8066889808755201971, guid: 46d0b28dd34412b4c90c82205d36db4f, type: 3}
   showAllDetections: 0
   targetTrackingDecay: 0.5
-  labelScale: 0.461
+  labelScale: 0.5
 --- !u!1 &1065269199
 GameObject:
   m_ObjectHideFlags: 0
@@ -1317,7 +1314,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1415529421
 Transform:
   m_ObjectHideFlags: 0
@@ -1833,7 +1830,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1914270541
 Transform:
   m_ObjectHideFlags: 0
