@@ -37,7 +37,7 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
     [SerializeField] private bool showAllDetections = true;
 
     [Header("Tracking Settings")]
-    [SerializeField] private float targetTrackingDecay = 0.5f;
+    [SerializeField] private float targetTrackingDecay = 1.5f;
     private float _targetLostTimestamp;
 
     private ObjectDetectionAgent _agent;
@@ -98,16 +98,20 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
     {
         if (_hasTarget)
         {
+
             if (Time.time <= _targetLostTimestamp + targetTrackingDecay)
             {
                 cueManager.SetVisibility(true);
                 cueManager.UpdateCueTransform(_targetPosition, _targetRotation, _targetScale);
             }
-            else if (Time.time > _targetLostTimestamp + targetTrackingDecay) {
+            else if (Time.time > _targetLostTimestamp + targetTrackingDecay)
+            {
                 _hasTarget = false;
                 cueManager.SetVisibility(false);
             }
         }
+
+        // cueManager.UpdateCueTransform(_targetPosition, _targetRotation, _targetScale);
     }
 
     private void ReturnBuffers()
@@ -173,7 +177,6 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
                 continue;
             }
 
-            /*
             // Fetch its position and scale to define bounding box
             var xmin = b.position.x;
             var ymin = b.position.y;
@@ -185,11 +188,6 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
             {
                 continue;
             }
-            */
-            
-            Vector3 pos = b.position;
-            Quaternion rot = b.rotation;
-            Vector3 scl = b.scale;
 
             // If a target label is specified, check if the current box's label matches it
             if (isTarget)

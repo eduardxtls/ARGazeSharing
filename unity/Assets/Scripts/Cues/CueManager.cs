@@ -22,7 +22,7 @@ public class CueManager : MonoBehaviour
     public Transform outerTransform;
 
     [Header("Loss of Tracking Settings")]
-    public float visibilityDecayDelay = 0.5f;
+    public float visibilityDecayDelay = 1.0f;
     private float _decayTimer = 0f;
 
     private Renderer overlayRenderer;
@@ -48,6 +48,15 @@ public class CueManager : MonoBehaviour
         if (!Application.isPlaying && simulateInEditor)
         {
             ExecuteLayoutUpdates();
+        }
+
+        if (_decayTimer > 0f)
+        {
+            _decayTimer -= Time.deltaTime;
+            if (_decayTimer < 0f)
+            {
+                SetVisibility(false);
+            }
         }
     }
 
@@ -109,6 +118,9 @@ public class CueManager : MonoBehaviour
 
     public void UpdateCueTransform(Vector3 position, Quaternion rotation, Vector3 scale)
     {
+        _decayTimer = visibilityDecayDelay;
+        SetVisibility(true);
+
         currentSize = new Vector2(scale.x, scale.y);
 
         if (outlineCue)

@@ -1123,7 +1123,7 @@ MonoBehaviour:
   cueManager: {fileID: 9610381}
   boundingBoxPrefab: {fileID: 8066889808755201971, guid: 46d0b28dd34412b4c90c82205d36db4f, type: 3}
   showAllDetections: 0
-  targetTrackingDecay: 0.5
+  targetTrackingDecay: 1.5
   labelScale: 0.5
 --- !u!1 &1065269199
 GameObject:
