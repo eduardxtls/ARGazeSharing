@@ -150,6 +150,7 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
             ? udpListener.GetLatestLabel().Trim().ToLower()
             : "";
 
+        /*
         // Delete old bounding boxes
         foreach (var g in _live)
         {
@@ -157,15 +158,18 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
             _pool.Enqueue(g);
         }
         _live.Clear();
+        */
 
         // Iterate through each detection box in the batch
         foreach (var b in batch)
         {
+            /*
             // Ignore persons
             if (b.label.Contains("person"))
             {
                 continue;
             }
+            */
 
             bool isTarget =
                 !string.IsNullOrEmpty(targetLabel) &&
@@ -186,6 +190,12 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
             // Attempt to project the bounding box into world space using depth information
             if (!TryProject(xmin, ymin, xmax, ymax, out var pos, out var rot, out var scl))
             {
+                if (isTarget && _hasTarget)
+                {
+                    // If the target is lost, keep the last known position for a while
+                    _targetLostTimestamp = Time.time;
+                    break;
+                }
                 continue;
             }
 
