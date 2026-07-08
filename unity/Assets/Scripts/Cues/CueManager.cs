@@ -134,7 +134,7 @@ public class CueManager : MonoBehaviour
 
             if (outerTransform != null)
             {
-                outerTransform.position = Application.isPlaying ? innerTransform.position : position; // Sync position lock
+                outerTransform.position = Vector3.Lerp(outerTransform.position, position, Time.deltaTime * cueSmoothSpeed); // Sync position lock
                 outerTransform.rotation = rotation;
 
                 // Total visual size = core tracked dimensions + thickness on both sides
