@@ -22,6 +22,7 @@ public class CueManager : MonoBehaviour
     public Transform outerTransform;
 
     [Header("Loss of Tracking Settings")]
+    public bool cueVisible = false;
     public float visibilityDecayDelay = 1.0f;
     private float _decayTimer = 0f;
 
@@ -154,6 +155,8 @@ public class CueManager : MonoBehaviour
 
     public void SetVisibility(bool visible)
     {
+        cueVisible = visible;
+
         // Only currently enabled cue is shown
         if (outlineCue) {
             outlineCue.SetActive(visible && currentDesign == "outline");

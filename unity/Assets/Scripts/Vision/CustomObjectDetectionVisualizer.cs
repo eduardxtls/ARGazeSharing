@@ -25,6 +25,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using Meta.XR.BuildingBlocks.AIBlocks;
 using Meta.XR;
+using System.Linq;
+
+public class TrackedDetection
+{
+    public string Label;
+    public Vector3 Position;
+    public Quaternion Rotation;
+    public Vector3 Scale;
+    public bool IsTarget;
+}
 
 public class CustomObjectDetectionVisualizer : MonoBehaviour
 {
@@ -41,9 +51,11 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
     private float _targetLostTimestamp;
 
     private ObjectDetectionAgent _agent;
+
     private readonly List<GameObject> _live = new();
     private readonly Queue<GameObject> _pool = new();
-    //#if MRUK_INSTALLED
+    private readonly List<TrackedDetection> _detections = new();
+
     [Tooltip("Scale factor for text labels relative to bounding box size")]
     [Range(0f, 1f)]
     [SerializeField] private float labelScale = 0.5f;
@@ -68,19 +80,41 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
     private Vector3 _targetScale;
     private bool _hasTarget = false;
 
-    //#endif
+    // Getters
+    public bool HasTarget => _hasTarget;
+    public Vector3 TargetPosition => _targetPosition;
+
+    public List<TrackedDetection> LiveDetectionsData => _detections;
+
+    public int CurrentLiveDetectionsCount => _detections.Count;
+
+    public bool IsTargetCurrentlyDetected
+    {
+        get
+        {
+            if (_detections == null || _detections.Count == 0) return false;
+            return _detections.Any(detection => detection.IsTarget);
+        }
+    }
+
+    // public float LastInferenceTimeMs { get; private set; }
+
+public bool IsCueVisible
+    {
+        get
+        {
+            return _hasTarget && cueManager.cueVisible;
+        }
+    }
 
     private void Awake()
     {
         _agent = GetComponent<ObjectDetectionAgent>();
-        //#if MRUK_INSTALLED
         _cam = FindAnyObjectByType<PassthroughCameraAccess>();
         _depth = GetComponent<DepthTextureAccess>();
         _eyeIdx = _cam.CameraPosition == PassthroughCameraAccess.CameraPositionType.Left ? 0 : 1;
-        //#endif
     }
 
-    //#if MRUK_INSTALLED
     private void OnEnable()
     {
         _agent.OnBoxesUpdated += HandleBatch;
@@ -110,8 +144,6 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
                 cueManager.SetVisibility(false);
             }
         }
-
-        // cueManager.UpdateCueTransform(_targetPosition, _targetRotation, _targetScale);
     }
 
     private void ReturnBuffers()
@@ -142,7 +174,6 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
         System.Array.Copy(d.ViewProjectionMatrix, _vpBuf, d.ViewProjectionMatrix.Length);
         _frame.ViewProjectionMatrix = _vpBuf;
     }
-    //#endif
 
     private void HandleBatch(List<BoxData> batch)
     {
@@ -150,36 +181,24 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
             ? udpListener.GetLatestLabel().Trim().ToLower()
             : "";
 
-        /*
-        // Delete old bounding boxes
         foreach (var g in _live)
         {
-            g.SetActive(false);
-            _pool.Enqueue(g);
+            if (g)
+            {
+                g.SetActive(false);
+                _pool.Enqueue(g);
+            }
         }
         _live.Clear();
-        */
+        _detections.Clear();
 
         // Iterate through each detection box in the batch
         foreach (var b in batch)
         {
-            /*
-            // Ignore persons
-            if (b.label.Contains("person"))
-            {
-                continue;
-            }
-            */
-
             bool isTarget =
                 !string.IsNullOrEmpty(targetLabel) &&
                 targetLabel != "none" &&
                 b.label.Contains(targetLabel);
-
-            if (!showAllDetections && !isTarget)
-            {
-                continue;
-            }
 
             // Fetch its position and scale to define bounding box
             var xmin = b.position.x;
@@ -199,6 +218,15 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
                 continue;
             }
 
+            _detections.Add(new TrackedDetection
+            {
+                Label = b.label,
+                Position = pos,
+                Rotation = rot,
+                Scale = scl,
+                IsTarget = isTarget
+            });
+
             // If a target label is specified, check if the current box's label matches it
             if (isTarget)
             {
@@ -209,6 +237,8 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
                 _hasTarget = true;
                 _targetLostTimestamp = Time.time;
             }
+
+
 
             // Only run when all boxes should show
             if (showAllDetections && boundingBoxPrefab != null)

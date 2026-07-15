@@ -15,6 +15,7 @@ public class UDPListener : MonoBehaviour
     [Header("References")]
     public CueManager cueManager;
     public AudioSource audioSource;
+    public ExperimentController experimentController;
 
     private UdpClient client;
     private Thread receiveThread;
@@ -116,6 +117,11 @@ public class UDPListener : MonoBehaviour
         {
             latestLabel = message.label;
             Debug.Log($"Detection - Label: {message.label}");
+
+            if (experimentController != null)
+            {
+                experimentController.StartTrial(message.label);
+            }
         }
         audioSource.Play();
     }
