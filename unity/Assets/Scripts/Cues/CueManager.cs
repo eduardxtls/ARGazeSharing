@@ -3,66 +3,28 @@ using UnityEngine;
 [ExecuteAlways]
 public class CueManager : MonoBehaviour
 {
-    [Header("Editor Simulation Settings")]
-    public bool simulateInEditor = false;
-    public Vector3 simulatedScale = new Vector3(1f, 1f, 1f);
-    [Range(0.01f, 1.0f)]
-    public float simulatedThickness = 0.1f; // Set directly in world meters (e.g., 0.05 = 5cm)
-
-    [Header("Movement Smoothness Settings")]
+    [Header("Movement Smoothness")]
     public float cueSmoothSpeed = 18.0f;
 
-    [Header("Default Design")]
+    [Header("Default Cue Design")]
     public string currentDesign = "outline";
 
-    [Header("Cue GameObjects")]
+    [Header("Cue Game Objects")]
     public GameObject overlayCue;
     public GameObject outlineCue;
     public Transform innerTransform;
     public Transform outerTransform;
 
-    [Header("Loss of Tracking Settings")]
+    [Header("Visibility State")]
     public bool cueVisible = false;
-    public float visibilityDecayDelay = 1.0f;
-    private float _decayTimer = 0f;
 
     private Renderer overlayRenderer;
     private SpriteRenderer outerSpriteRenderer;
 
-    private Vector3 outlineVelocity = Vector3.zero;
-    private Vector3 overlayVelocity = Vector3.zero;
-
     // Outline size settings
     private float currentThickness = 0.01f;
     private Vector2 currentSize = new Vector2(1f, 1f);
-
-
-    private void OnValidate()
-    {
-        CacheMaskingReferences();
-        ExecuteLayoutUpdates();
-    }
-
-    private void Update()
-    {
-        // Force the editor viewport to redraw continuously while dragging sliders
-        if (!Application.isPlaying && simulateInEditor)
-        {
-            ExecuteLayoutUpdates();
-        }
-
-        if (_decayTimer > 0f)
-        {
-            _decayTimer -= Time.deltaTime;
-            if (_decayTimer < 0f)
-            {
-                SetVisibility(false);
-            }
-        }
-    }
-
-
-
+    
     private void Awake()
     {
         if (overlayCue) overlayRenderer = overlayCue.GetComponent<Renderer>();
@@ -72,8 +34,8 @@ public class CueManager : MonoBehaviour
 
         // Default initialization
         SetDesign(currentDesign);
-        SetColor("#32cd32");
-        SetAlpha("0.9");
+        SetColor("#fc0303");
+        SetAlpha("1.0");
         SetVisibility(true);
     }
 
@@ -90,21 +52,6 @@ public class CueManager : MonoBehaviour
         }
     }
 
-    private void ExecuteLayoutUpdates()
-    {
-        if (simulateInEditor)
-        {
-            currentThickness = simulatedThickness;
-            UpdateCueTransform(transform.position, transform.rotation, simulatedScale);
-
-#if UNITY_EDITOR
-            // Instantly repaints the scene view to bypass Unity's editor rendering freeze
-            UnityEditor.SceneView.RepaintAll();
-#endif
-        }
-    }
-
-
     public void ApplyDesign(DesignMessage design)
     {
         string value = design.value;
@@ -119,9 +66,6 @@ public class CueManager : MonoBehaviour
 
     public void UpdateCueTransform(Vector3 position, Quaternion rotation, Vector3 scale)
     {
-        _decayTimer = visibilityDecayDelay;
-        SetVisibility(true);
-
         currentSize = new Vector2(scale.x, scale.y);
 
         if (outlineCue)

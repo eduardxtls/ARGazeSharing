@@ -1,7 +1,5 @@
 using UnityEngine;
-using System.Collections.Generic;
 using System.IO;
-using Oculus.Interaction.Editor;
 
 public class ExperimentController : MonoBehaviour
 {
@@ -21,6 +19,11 @@ public class ExperimentController : MonoBehaviour
     [Tooltip("Time threshold to trigger grab interaction (s)")]
     [SerializeField] private float grabDwellTime = 0.5f;
 
+    [Header("Audio Debugging")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip successClip;
+    [SerializeField] private AudioClip mistakeClip;
+
     private string _currentLabel = "";
     private bool _isTrialActive = false;
     private bool _isWaitingForCue = false;
@@ -28,9 +31,7 @@ public class ExperimentController : MonoBehaviour
     private float _trialStartTime;
     private int _mistakesInCurrentTrial = 0;
     private float _dwellTimer = 0f;
-
-    private bool _hasReachedTarget = false;
-    private float _reachTime;
+    private float _mistakeDwellTimer = 0f;
     private bool _wasInWrongObjectZone = false;
 
     private string _logFilePath;
@@ -43,10 +44,15 @@ public class ExperimentController : MonoBehaviour
 
     public void StartTrial(string targetIngredient)
     {
+        // Reset visuals and state for new trial
+        if (visualizer != null)
+        {
+            visualizer.ClearTarget();
+        }
+
         _currentLabel = targetIngredient.Trim().ToLower();
         _mistakesInCurrentTrial = 0;
         _dwellTimer = 0f;
-        _hasReachedTarget = false;
         _wasInWrongObjectZone = false;
         
         _isTrialActive = false;
@@ -62,16 +68,6 @@ public class ExperimentController : MonoBehaviour
                 _isTrialActive = true;
                 _isWaitingForCue = false;
                 _trialStartTime = Time.time;
-            }
-            else if (visualizer != null && !visualizer.HasTarget)
-            {
-                _isWaitingForCue = false;
-                _dwellTimer = 0f;
-
-                if (cueManager != null)
-                {
-                    cueManager.SetVisibility(false);
-                }
             }
             else
             {
@@ -90,13 +86,6 @@ public class ExperimentController : MonoBehaviour
 
             if (distanceToTarget <= grabProximityRadius)
             {
-                if (!_hasReachedTarget)
-                {
-                    _hasReachedTarget = true;
-                    _reachTime = Time.time - _trialStartTime;
-                    Debug.Log("Target reached! Time: " + _reachTime);
-                }
-
                 _dwellTimer += Time.deltaTime;
                 if (_dwellTimer >= grabDwellTime)
                 {
@@ -123,29 +112,45 @@ public class ExperimentController : MonoBehaviour
                 if (distanceToWrongObject <= grabProximityRadius)
                 {
                     handInWrongZone = true;
-                    
-                    if (!_wasInWrongObjectZone)
-                    {
-                        _mistakesInCurrentTrial++;
-                        _wasInWrongObjectZone = true;
-                        Debug.Log("Mistake made! Total mistakes: " + _mistakesInCurrentTrial);
-                    }
+                    break;
                 }
             }
         }
 
-        if (!handInWrongZone)
+        if (handInWrongZone)
+        {
+            if (!_wasInWrongObjectZone)
+            {
+                _mistakeDwellTimer += Time.deltaTime;
+
+                if (_mistakeDwellTimer >= grabDwellTime)
+                {
+                    _mistakesInCurrentTrial++;
+                    _wasInWrongObjectZone = true;
+                    _mistakeDwellTimer = 0f;
+
+                    audioSource.PlayOneShot(mistakeClip);
+                    Debug.Log($"Mistake detected! Total mistakes: {_mistakesInCurrentTrial}");
+                }
+            }
+        }
+        else
         {
             _wasInWrongObjectZone = false;
+            _mistakeDwellTimer = 0f;
         }
     }
 
     public void CompleteTrial()
     {
         _isTrialActive = false;
-        float totalTime = Time.time - _trialStartTime;
 
-        SaveTrialData(totalTime, _reachTime, _mistakesInCurrentTrial);
+        float timeToReach = (Time.time - _trialStartTime) - grabDwellTime;
+        timeToReach = Mathf.Max(0f, timeToReach);
+
+        audioSource.PlayOneShot(successClip);
+
+        SaveTrialData(timeToReach, _mistakesInCurrentTrial);
 
         if (cueManager != null)
         {
@@ -182,20 +187,30 @@ public class ExperimentController : MonoBehaviour
     {
         if (!File.Exists(_logFilePath))
         {
-            File.WriteAllText(_logFilePath, "Timestamp,TargetItem,ReachTime_Sec,MistakesCount\n");
+            File.WriteAllText(_logFilePath, "Timestamp,TargetItem,TotalTimeSec,MistakesCount\n");
         }
     }
 
-    private void SaveTrialData(float total, float reach, int mistakes)
+    private void SaveTrialData(float total, int mistakes)
     {
-        try
+        string entry = $"{System.DateTime.Now},{_currentLabel},{total},{mistakes}\n";
+
+        if (NetworkLogger.Instance != null)
         {
-            string entry = $"{System.DateTime.Now},{_currentLabel},{reach},{total},{mistakes}\n";
-            File.AppendAllText(_logFilePath, entry);
+            NetworkLogger.Instance.SendLog(entry);
         }
-        catch (System.Exception e)
+        else
         {
-            Debug.LogError($"CSV write error: {e}");
+            Debug.Log("NetworkLogger instance not found in scene. Logging locally...");
+
+            try
+            {
+                System.IO.File.AppendAllText(_logFilePath, entry);
+            }
+            catch (System.Exception e)
+            {
+                Debug.Log($"Local fallback write error: {e.Message}");
+            }
         }
     }
 }

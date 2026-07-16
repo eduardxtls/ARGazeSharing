@@ -46,10 +46,6 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
     [Tooltip("Enable or disable bounding box visualization")]
     [SerializeField] private bool showAllDetections = true;
 
-    [Header("Tracking Settings")]
-    [SerializeField] private float targetTrackingDecay = 1.5f;
-    private float _targetLostTimestamp;
-
     private ObjectDetectionAgent _agent;
 
     private readonly List<GameObject> _live = new();
@@ -80,6 +76,8 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
     private Vector3 _targetScale;
     private bool _hasTarget = false;
 
+    private float _lastBatchTimestamp;
+
     // Getters
     public bool HasTarget => _hasTarget;
     public Vector3 TargetPosition => _targetPosition;
@@ -97,9 +95,9 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
         }
     }
 
-    // public float LastInferenceTimeMs { get; private set; }
+    public float LastInferenceTimeMs { get; private set; }
 
-public bool IsCueVisible
+    public bool IsCueVisible
     {
         get
         {
@@ -132,17 +130,8 @@ public bool IsCueVisible
     {
         if (_hasTarget)
         {
-
-            if (Time.time <= _targetLostTimestamp + targetTrackingDecay)
-            {
-                cueManager.SetVisibility(true);
-                cueManager.UpdateCueTransform(_targetPosition, _targetRotation, _targetScale);
-            }
-            else if (Time.time > _targetLostTimestamp + targetTrackingDecay)
-            {
-                _hasTarget = false;
-                cueManager.SetVisibility(false);
-            }
+            cueManager.SetVisibility(true);
+            cueManager.UpdateCueTransform(_targetPosition, _targetRotation, _targetScale);
         }
     }
 
@@ -177,10 +166,16 @@ public bool IsCueVisible
 
     private void HandleBatch(List<BoxData> batch)
     {
+        // Compute the time between current batch and last batch (inference and processing time)
+        float now = Time.realtimeSinceStartup;
+        LastInferenceTimeMs = (now - _lastBatchTimestamp) * 1000f;
+        _lastBatchTimestamp = now;
+
         string targetLabel = udpListener != null
             ? udpListener.GetLatestLabel().Trim().ToLower()
             : "";
 
+        // Clear previous detections and return bounding boxes to the pool
         foreach (var g in _live)
         {
             if (g)
@@ -209,15 +204,10 @@ public bool IsCueVisible
             // Attempt to project the bounding box into world space using depth information
             if (!TryProject(xmin, ymin, xmax, ymax, out var pos, out var rot, out var scl))
             {
-                if (isTarget && _hasTarget)
-                {
-                    // If the target is lost, keep the last known position for a while
-                    _targetLostTimestamp = Time.time;
-                    break;
-                }
                 continue;
             }
 
+            // Store the detection data for later use
             _detections.Add(new TrackedDetection
             {
                 Label = b.label,
@@ -227,7 +217,7 @@ public bool IsCueVisible
                 IsTarget = isTarget
             });
 
-            // If a target label is specified, check if the current box's label matches it
+            // If a target label is specified, check if the current box label matches it
             if (isTarget)
             {
                 _targetPosition = pos;
@@ -235,10 +225,7 @@ public bool IsCueVisible
                 _targetScale = scl;
 
                 _hasTarget = true;
-                _targetLostTimestamp = Time.time;
             }
-
-
 
             // Only run when all boxes should show
             if (showAllDetections && boundingBoxPrefab != null)
@@ -342,6 +329,17 @@ public bool IsCueVisible
         scale = new Vector3(w, h, 1f);
 
         return true;
+    }
+
+    public void ClearTarget()
+    {
+        _hasTarget = false;
+        _targetPosition = Vector3.zero;
+        _detections.Clear();
+        if (cueManager != null)
+        {
+            cueManager.SetVisibility(false);
+        }
     }
 
     private void ClearAll()
