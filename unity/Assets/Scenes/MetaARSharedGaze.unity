@@ -1447,7 +1447,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   providerAsset: {fileID: 11400000, guid: 8adcf4fe364fed44aa4a63812347ee46, type: 2}
-  minConfidence: 0.5
+  minConfidence: 0.8
   detectEveryNFrames: 1
   captureMaxResolution: 1280
   onDetectionResponseReceived:

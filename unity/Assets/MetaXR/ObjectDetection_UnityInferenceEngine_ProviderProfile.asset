@@ -27,7 +27,7 @@ MonoBehaviour:
   layersPerFrame: 22
   inputWidth: 640
   inputHeight: 640
-  scoreThreshold: 0.5
+  scoreThreshold: 0.8
   llmConfig:
     inferenceExecutionMode: 1
     stepsPerFrame: 150

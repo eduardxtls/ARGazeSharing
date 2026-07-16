@@ -113,16 +113,22 @@ public class UDPListener : MonoBehaviour
 
     void HandleDetection(DetectionMessage message)
     {
-        if (message != null && !string.IsNullOrEmpty(message.label))
+        if (message == null || string.IsNullOrEmpty(message.label))
         {
-            latestLabel = message.label;
-            Debug.Log($"Detection - Label: {message.label}");
-
-            if (experimentController != null)
-            {
-                experimentController.StartTrial(message.label);
-            }
+            return;
         }
+
+        string newLabel = message.label.Trim().ToLower();
+
+        // Filter out repeated detections of same ingredient
+        if (newLabel == latestLabel)
+        {
+            return;
+        }
+
+        latestLabel = newLabel;
+
+        experimentController.StartTrial(newLabel);
         audioSource.Play();
     }
 
