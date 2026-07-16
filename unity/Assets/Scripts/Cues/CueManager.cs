@@ -126,11 +126,12 @@ public class CueManager : MonoBehaviour
     {
         switch (size.ToLower())
         {
-            case "tiny":    currentThickness = 0.005f; break;
-            case "small":   currentThickness = 0.01f; break;
-            case "medium":  currentThickness = 0.025f; break;
-            case "large":   currentThickness = 0.05f; break;
-            case "huge":    currentThickness = 0.075f; break;
+            case "tiny":        currentThickness = 0.005f;  break;
+            case "small":       currentThickness = 0.01f;   break;
+            case "medium":      currentThickness = 0.025f;  break;
+            case "large":       currentThickness = 0.05f;   break;
+            case "huge":        currentThickness = 0.075f;  break;
+            case "spotlight":   currentThickness = 25.0f;   break;
             default:        Debug.Log($"Unknown size value: {size}"); return;
         }
 

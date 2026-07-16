@@ -3,7 +3,7 @@ import json
 from nicegui import ui
 
 # --- UDP Configuration ---
-UNITY_IP = "10.175.57.181" 
+UNITY_IP = "10.113.38.82" 
 # UNITY_IP = "127.0.0.1" 
 UNITY_PORT = 8080
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -22,7 +22,7 @@ def send_update(param_type, value):
 
 # --- Parameter and value definitions ---
 CUE_TYPES = ['None', 'Overlay', 'Outline']
-SIZES = ['Tiny', 'Small', 'Medium', 'Large', 'Huge']
+SIZES = ['Tiny', 'Small', 'Medium', 'Large', 'Huge', 'Spotlight']
 COLORS = {
     'Red': "#FF0000", 'Green': "#09ff00", 'Blue': "#0033ff", 
     'Yellow': "#ffe100", 'Cyan': "#00FFFF", 'Magenta': "#D400FF", 
@@ -45,7 +45,7 @@ with ui.column().classes('w-full items-center p-8 gap-6'):
     # TODO: Rethink size options to work with object detections
     # 2. Size
     with ui.card().classes(CARD_STYLE):
-        ui.label('Object Scale').classes('text-xs font-bold text-slate-500 mb-2')
+        ui.label('Scale').classes('text-xs font-bold text-slate-500 mb-2')
         ui.select(SIZES, value='Medium', on_change=lambda e: send_update("size", e.value)).classes('w-full').props('dark dense outlined color=slate-600')
 
     # 3. Color Palette
