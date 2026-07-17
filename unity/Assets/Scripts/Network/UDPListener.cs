@@ -137,6 +137,11 @@ public class UDPListener : MonoBehaviour
         return latestLabel;
     }
 
+    public void ResetLatestLabel()
+    {
+        latestLabel = "none";
+    }
+
     private void OnApplicationQuit()
     {
         running = false;

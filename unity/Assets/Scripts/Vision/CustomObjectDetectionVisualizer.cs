@@ -173,7 +173,7 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
 
         string targetLabel = udpListener != null
             ? udpListener.GetLatestLabel().Trim().ToLower()
-            : "";
+            : "none";
 
         // Clear previous detections and return bounding boxes to the pool
         foreach (var g in _live)
@@ -335,7 +335,7 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
     {
         _hasTarget = false;
         _targetPosition = Vector3.zero;
-        _detections.Clear();
+        // _detections.Clear();
         if (cueManager != null)
         {
             cueManager.SetVisibility(false);

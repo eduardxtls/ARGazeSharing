@@ -131,7 +131,7 @@ public class CueManager : MonoBehaviour
             case "medium":      currentThickness = 0.025f;  break;
             case "large":       currentThickness = 0.05f;   break;
             case "huge":        currentThickness = 0.075f;  break;
-            case "spotlight":   currentThickness = 25.0f;   break;
+            case "spotlight":   currentThickness = 75.0f;   break;
             default:        Debug.Log($"Unknown size value: {size}"); return;
         }
 

@@ -5,6 +5,7 @@ public class ExperimentController : MonoBehaviour
 {
     [Header("Dependencies")]
     [SerializeField] private CustomObjectDetectionVisualizer visualizer;
+    [SerializeField] private UDPListener listener;
     [SerializeField] private CueManager cueManager;
 
     [Header("Hand Tracking")]
@@ -77,14 +78,23 @@ public class ExperimentController : MonoBehaviour
 
         if (!_isTrialActive) return;
 
-        Vector3 handPos = GetActiveHandPosition();
-        if (handPos == Vector3.zero) return;
+        Vector3 leftPos = (leftHand != null && leftHand.IsTracked && leftSkeleton != null && leftSkeleton.IsInitialized)
+            ? GetIndexPosition(leftSkeleton)
+            : Vector3.zero;
+
+
+        Vector3 rightPos = (rightHand != null && rightHand.IsTracked && rightSkeleton != null && rightSkeleton.IsInitialized)
+            ? GetIndexPosition(rightSkeleton)
+            : Vector3.zero;
+
+        if (leftPos == Vector3.zero && rightPos == Vector3.zero) return;
 
         if (visualizer.HasTarget)
         {
-            float distanceToTarget = Vector3.Distance(handPos, visualizer.TargetPosition);
+            bool leftInTarget = leftPos != Vector3.zero && Vector3.Distance(leftPos, visualizer.TargetPosition) <= grabProximityRadius;
+            bool rightInTarget = rightPos != Vector3.zero && Vector3.Distance(rightPos, visualizer.TargetPosition) <= grabProximityRadius;
 
-            if (distanceToTarget <= grabProximityRadius)
+            if (leftInTarget || rightInTarget)
             {
                 _dwellTimer += Time.deltaTime;
                 if (_dwellTimer >= grabDwellTime)
@@ -107,9 +117,10 @@ public class ExperimentController : MonoBehaviour
             {
                 if (detection.IsTarget) continue;
 
-                float distanceToWrongObject = Vector3.Distance(handPos, detection.Position);
+                bool leftInWrong = leftPos != Vector3.zero && Vector3.Distance(leftPos, detection.Position) <= grabProximityRadius;
+                bool rightInWrong = rightPos != Vector3.zero && Vector3.Distance(rightPos, detection.Position) <= grabProximityRadius;
 
-                if (distanceToWrongObject <= grabProximityRadius)
+                if (leftInWrong || rightInWrong)
                 {
                     handInWrongZone = true;
                     break;
@@ -152,23 +163,11 @@ public class ExperimentController : MonoBehaviour
 
         SaveTrialData(timeToReach, _mistakesInCurrentTrial);
 
-        if (cueManager != null)
+        if (listener != null)
         {
-            cueManager.SetVisibility(false);
+            visualizer.ClearTarget();
+            listener.ResetLatestLabel();
         }
-    }
-
-    private Vector3 GetActiveHandPosition()
-    {
-        if (leftHand != null && leftHand.IsTracked && leftSkeleton != null && leftSkeleton.IsInitialized)
-        {
-            return GetIndexPosition(leftSkeleton);
-        }
-        else if (rightHand != null && rightHand.IsTracked && rightSkeleton != null && rightSkeleton.IsInitialized)
-        {
-            return GetIndexPosition(rightSkeleton);
-        }
-        return Vector3.zero;
     }
 
     private Vector3 GetIndexPosition(OVRSkeleton skeleton)
