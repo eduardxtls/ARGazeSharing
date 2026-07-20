@@ -26,6 +26,8 @@ using UnityEngine.UI;
 using Meta.XR.BuildingBlocks.AIBlocks;
 using Meta.XR;
 using System.Linq;
+using System.Diagnostics;
+using System.IO;
 
 public class TrackedDetection
 {
@@ -42,9 +44,14 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
     [SerializeField] private CueManager cueManager;
 
     [SerializeField] private GameObject boundingBoxPrefab;
-
     [Tooltip("Enable or disable bounding box visualization")]
     [SerializeField] private bool showAllDetections = true;
+
+    [Header("CSV Inference Logging")]
+    [SerializeField] private bool enableCSVLogging = false;
+
+    private StreamWriter _csvWriter;
+    private string _csvFilePath;
 
     private ObjectDetectionAgent _agent;
 
@@ -76,8 +83,6 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
     private Vector3 _targetScale;
     private bool _hasTarget = false;
 
-    private float _lastBatchTimestamp;
-
     // Getters
     public bool HasTarget => _hasTarget;
     public Vector3 TargetPosition => _targetPosition;
@@ -97,12 +102,37 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
 
     public float LastInferenceTimeMs { get; private set; }
 
+    private readonly Stopwatch _inferenceStopwatch = new Stopwatch();
+
     public bool IsCueVisible
     {
         get
         {
             return _hasTarget && cueManager.cueVisible;
         }
+    }
+
+    private void Start()
+    {
+        if (enableCSVLogging)
+        {
+            string fileName = $"inference_log_{System.DateTime.Now:yyyyMMdd_HHmmss}.csv";
+            _csvFilePath = Path.Combine(Application.persistentDataPath, fileName);
+
+            _csvWriter = new StreamWriter(_csvFilePath);
+            _csvWriter.WriteLine("Timestamp,FrameCount,InferenceTimeMs,DetectionsCount,IsTargetDetected");
+            _csvWriter.Flush();
+
+            UnityEngine.Debug.Log($"CSV logging enabled. Log file: {_csvFilePath}");
+        }
+    }
+
+    private void LogInferenceData()
+    {
+        if (_csvWriter == null) return;
+        
+        string line = $"{Time.realtimeSinceStartup:F3},{Time.frameCount},{LastInferenceTimeMs:F2},{_detections.Count},{_hasTarget}";
+        _csvWriter.WriteLine(line);
     }
 
     private void Awake()
@@ -123,7 +153,18 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
     {
         _agent.OnBoxesUpdated -= HandleBatch;
         _depth.OnDepthTextureUpdateCPU -= OnDepth;
+        _inferenceStopwatch.Reset();
         ReturnBuffers();
+    }
+
+    private void OnDestroy()
+    {
+        if (_csvWriter != null)
+        {
+            _csvWriter.Flush();
+            _csvWriter.Close();
+            _csvWriter = null;
+        }
     }
 
     private void Update()
@@ -166,14 +207,24 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
 
     private void HandleBatch(List<BoxData> batch)
     {
-        // Compute the time between current batch and last batch (inference and processing time)
-        float now = Time.realtimeSinceStartup;
-        LastInferenceTimeMs = (now - _lastBatchTimestamp) * 1000f;
-        _lastBatchTimestamp = now;
+        // Measurements for inference time (between batches)
+        if (_inferenceStopwatch.IsRunning)
+        {
+            _inferenceStopwatch.Stop();
+            LastInferenceTimeMs = (float)_inferenceStopwatch.Elapsed.TotalMilliseconds;
+            _inferenceStopwatch.Reset();
+            LogInferenceData();
+        }
+        else
+        {
+            _inferenceStopwatch.Start();
+            LastInferenceTimeMs = 0f;
+        }
 
+        // Fetch the target label currently focused
         string targetLabel = udpListener != null
-            ? udpListener.GetLatestLabel().Trim().ToLower()
-            : "none";
+                ? udpListener.GetLatestLabel().Trim().ToLower()
+                : "none";
 
         // Clear previous detections and return bounding boxes to the pool
         foreach (var g in _live)
@@ -251,6 +302,7 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
         }
     }
 
+    // Projects the bounding box coordinates into world space using depth information
     public bool TryProject(float xmin, float ymin, float xmax, float ymax,
         out Vector3 world, out Quaternion rot, out Vector3 scale)
     {
@@ -330,7 +382,7 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
 
         return true;
     }
-
+ 
     public void ClearTarget()
     {
         _hasTarget = false;

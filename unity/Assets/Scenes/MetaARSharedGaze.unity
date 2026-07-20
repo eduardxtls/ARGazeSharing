@@ -543,7 +543,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: e51af9c1b8277664f94b367cc1b0242b, type: 3}
-  m_Color: {r: 0.9882353, g: 0.011764706, b: 0.011764706, a: 10}
+  m_Color: {r: 0.9882353, g: 0.011764706, b: 0.011764706, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1152,7 +1152,7 @@ Material:
     - _ZWrite: 0
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 0.9882353, g: 0.011764706, b: 0.011764706, a: 10}
+    - _Color: {r: 0.9882353, g: 0.011764706, b: 0.011764706, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
@@ -1514,6 +1514,7 @@ MonoBehaviour:
   cueManager: {fileID: 9610381}
   boundingBoxPrefab: {fileID: 8066889808755201971, guid: 46d0b28dd34412b4c90c82205d36db4f, type: 3}
   showAllDetections: 0
+  enableCSVLogging: 1
   labelScale: 0.5
 --- !u!114 &922092745
 MonoBehaviour:
@@ -3729,7 +3730,7 @@ MonoBehaviour:
           DisplayName: Detection Count
         memberName: CurrentLiveDetectionsCount
         _editorSelectedGizmoIndex: 0
-      - enabled: 0
+      - enabled: 1
         typeName: CustomObjectDetectionVisualizer, Assembly-CSharp, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
         attribute:
@@ -3803,6 +3804,111 @@ MonoBehaviour:
           Description: 
           DisplayName: 
         memberName: ClearTarget
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: CustomObjectDetectionVisualizer, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: _inferenceStopwatch
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: CustomObjectDetectionVisualizer, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Start
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: CustomObjectDetectionVisualizer, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: LogInferenceData
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: CustomObjectDetectionVisualizer, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: OnDestroy
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: CustomObjectDetectionVisualizer, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: enableCSVLogging
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: CustomObjectDetectionVisualizer, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: _csvWriter
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: CustomObjectDetectionVisualizer, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: _csvFilePath
         _editorSelectedGizmoIndex: 0
 --- !u!1 &1034965042
 GameObject:
@@ -5283,6 +5389,516 @@ MonoBehaviour:
           Description: 
           DisplayName: 
         memberName: isActiveAndEnabled
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Play
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Stop
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Play
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Stop
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Play
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Stop
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Play
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Stop
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Play
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Stop
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Play
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Stop
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Play
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Stop
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Play
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Stop
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Play
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Stop
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Play
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Stop
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Play
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Stop
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Play
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Stop
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Play
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Stop
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Play
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Stop
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Play
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Stop
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Play
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Stop
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Play
+        _editorSelectedGizmoIndex: 0
+      - enabled: 0
+        typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        attribute:
+          GizmoType: 0
+          ShowGizmoByDefault: 0
+          Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+          Tweakable: 1
+          Min: 0
+          Max: 1
+          Category: 
+          Description: 
+          DisplayName: 
+        memberName: Stop
         _editorSelectedGizmoIndex: 0
       - enabled: 0
         typeName: UnityEngine.AudioSource, UnityEngine.AudioModule, Version=0.0.0.0,
