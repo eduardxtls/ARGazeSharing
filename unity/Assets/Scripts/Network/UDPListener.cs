@@ -6,11 +6,14 @@ using System.Threading;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class UDPListener : MonoBehaviour
 {
     [Header("Network Settings")]
     public int port = 8080;
+
+    public string LaptopIP { get; private set; } = "Not connected";
 
     [Header("References")]
     public CueManager cueManager;
@@ -64,6 +67,7 @@ public class UDPListener : MonoBehaviour
             try
             {
                 byte[] data = client.Receive(ref anyIP);
+                LaptopIP = anyIP.Address.ToString();
                 string json = Encoding.UTF8.GetString(data);
                 messageQueue.Enqueue(json);
             }

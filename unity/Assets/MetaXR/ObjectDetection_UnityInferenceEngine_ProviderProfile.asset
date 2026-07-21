@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks.AIBlocks::Meta.XR.BuildingBlocks.AIBlocks.UnityInferenceEngineProvider
   supportedInferenceTypes: 4
   mode: 0
-  modelFile: {fileID: 5022602860645237092, guid: 7d4ecbea8959fa442a39621c5e44edee, type: 3}
+  modelFile: {fileID: 5022602860645237092, guid: 41ab9ba600d8e574381fcc38d5355064, type: 3}
   streamingAssetModel: {fileID: 0}
   useStreamingAsset: 0
   streamingAssetFileName: 

@@ -147,6 +147,10 @@ PlayerSettings:
   preloadedAssets:
   - {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   - {fileID: 11400000, guid: 53fcb1f1539b7e74e9e8730cde1fcb78, type: 2}
+  - {fileID: 11400000, guid: 5b6d9e81fd919f042a4e3a3b73358937, type: 2}
+  - {fileID: 7251656200597948631, guid: 0aff1ca37c2b19d48b2a0f336d612eb6, type: 2}
+  - {fileID: 11400000, guid: 1936b6927db2ae84c856fbbce23fb05f, type: 2}
+  - {fileID: -249068333058730836, guid: f56d50b34eb9aed4dbd95b638d7d725e, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -859,7 +863,7 @@ PlayerSettings:
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
   metroPackageName: ARV2
-  metroPackageVersion: 
+  metroPackageVersion: 1.0.0.0
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
@@ -867,7 +871,7 @@ PlayerSettings:
   metroCertificateNotAfter: 0000000000000000
   metroApplicationDescription: ARV2
   wsaImages: {}
-  metroTileShortName: 
+  metroTileShortName: ARV2
   metroTileShowName: 0
   metroMediumTileShowName: 0
   metroLargeTileShowName: 0

@@ -194,22 +194,22 @@ public class ExperimentController : MonoBehaviour
     {
         string entry = $"{System.DateTime.Now},{_currentLabel},{total},{mistakes}\n";
 
+        try
+        {
+            System.IO.File.AppendAllText(_logFilePath, entry);
+        }
+        catch (System.Exception e) {
+            Debug.LogError(e);
+        }
+
         if (NetworkLogger.Instance != null)
         {
-            NetworkLogger.Instance.SendLog(entry);
-        }
-        else
-        {
-            Debug.Log("NetworkLogger instance not found in scene. Logging locally...");
+            if (listener != null && !string.IsNullOrEmpty(listener.LaptopIP))
+            {
+                NetworkLogger.Instance.LaptopIP = listener.LaptopIP;
+            }
 
-            try
-            {
-                System.IO.File.AppendAllText(_logFilePath, entry);
-            }
-            catch (System.Exception e)
-            {
-                Debug.Log($"Local fallback write error: {e.Message}");
-            }
+            NetworkLogger.Instance.SendLog(entry);
         }
     }
 }

@@ -11,6 +11,12 @@ public class NetworkLogger : MonoBehaviour
     [SerializeField] private string laptopIP = "";
     [SerializeField] private int laptopPort = 5005;
 
+    public string LaptopIP
+    {
+        get => laptopIP;
+        set => laptopIP = value;
+    }
+
     private void Awake()
     {
         if (Instance == null)
@@ -24,8 +30,21 @@ public class NetworkLogger : MonoBehaviour
         }
     }
 
+    public void UpdateLaptopIP(string ip)
+    {
+        if (!string.IsNullOrEmpty(laptopIP) && laptopIP != ip)
+        {
+            laptopIP = ip;
+        }
+    }
+
     public void SendLog(string csvLine)
     {
+        if (string.IsNullOrEmpty(laptopIP))
+        {
+            return;
+        }
+
         Task.Run(() =>
         {
             try
