@@ -48,7 +48,7 @@ public class CustomObjectDetectionVisualizer : MonoBehaviour
     [SerializeField] private bool showAllDetections = true;
 
     [Header("CSV Inference Logging")]
-    [SerializeField] private bool enableCSVLogging = false;
+    [SerializeField] private bool enableCSVLogging = true;
 
     private StreamWriter _csvWriter;
     private string _csvFilePath;

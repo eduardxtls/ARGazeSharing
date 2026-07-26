@@ -133,7 +133,7 @@ public class UDPListener : MonoBehaviour
         latestLabel = newLabel;
 
         experimentController.StartTrial(newLabel);
-        audioSource.Play();
+        // audioSource.Play();
     }
 
     public string GetLatestLabel()

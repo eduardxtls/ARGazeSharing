@@ -39,7 +39,10 @@ public class ExperimentController : MonoBehaviour
 
     private void Start()
     {
-        _logFilePath = Path.Combine(Application.persistentDataPath, "experiment_log.csv");
+        string timestamp = System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+        string fileName = $"batch_log_{timestamp}.csv";
+
+        _logFilePath = Path.Combine(Application.persistentDataPath, fileName);
         InitializeCSV();
     }
 
