@@ -4,7 +4,7 @@ from datetime import datetime
 from ultralytics import YOLO
 from pupil_labs.realtime_api import FixationOnsetEventData, FixationEventData
 
-# Internal imports
+# Internal component imports
 from gaze.pupil_client import PupilClient
 from gaze.pupil_client import ReplayPupilClient
 from vision.detector import ObjectDetector
@@ -18,16 +18,17 @@ MODE = "live"
 
 # "selective" for dwell filter and "continuous" for constant feedback
 # In selective mode, feedback is provided only after a given fixation threshold
-FEEDBACK = "continuous" 
-DWELL_THRESHOLD = 3.0
+FEEDBACK = "selective"
+DWELL_THRESHOLD = 0.75
 
 # Aruco tracking toggle
 ARUCO = False
 
-
 def main():
+    global FEEDBACK
+
     # Vision model selection
-    model = YOLO(".\python\models\yolo12n.pt")
+    model = YOLO(r"D:\Masterarbeit\TIK\Seeing-Through-Others-Eyes\python\models\ingredients.pt")
 
     # Object recognition parameters
     AI_UPDATE_INTERVAL = 0.2
@@ -36,7 +37,7 @@ def main():
     if MODE == "live":
         client = PupilClient()
         client.connect()
-        udp_bridge = UDPSender(ip="127.0.0.1", port=8080)
+        udp_bridge = UDPSender(ip="10.175.192.199", port=8080)
 
         # Aruco parameters
         if ARUCO:
@@ -48,7 +49,7 @@ def main():
             tracker = None
 
     else:
-        video_path = r"" # Local path to video
+        video_path = r""
         gaze_csv_path = r""
         client = ReplayPupilClient(video_path, gaze_csv_path)
         udp_bridge = None
@@ -60,7 +61,7 @@ def main():
 
     # Recording
     is_recording = False
-    save_local_video = False
+    save_local_video = True
     video_writer = None
     target_fps = 30.0
     frame_interval = 1.0 / target_fps
@@ -76,9 +77,11 @@ def main():
     current_focused_label = None
     dwell_start_time = None
     dwell_triggered = False
+    dwell_message_sent = False
 
     try:
         for data in client.stream():
+            # Fetch data from the Pupil labs stream
             frame = data["frame"]
             gaze = data["gaze"]
             current_time = time.time()
@@ -91,7 +94,7 @@ def main():
                 video_writer = cv2.VideoWriter(filename, fourcc, target_fps, (w, h))
                 print(f"Started local video recording: {filename}")
 
-            # Tracking the marker
+            # Track the marker
             if ARUCO and tracker is not None:
                 if current_time - last_aruco_update_time > ARUCO_UPDATE_INTERVAL:
                     pose = tracker.estimate_pose(frame)
@@ -100,7 +103,7 @@ def main():
                         rvec, tvec = pose
                         last_aruco_update_time = current_time
 
-            # PL Invisible
+            # PL Invisible configuration for fixations - no built-in fixation event handling as in PL Neon
             '''
             if MODE == "live":
                 is_fixating = True
@@ -123,25 +126,34 @@ def main():
                 selected_object = fusion.find_looked_at_object(gaze, detections)
                 last_ai_update_time = current_time
 
-            # Dwell filter
-            if selected_object is not None:
-                new_label = selected_object["label"]
+                # Dwell filter
+                if selected_object is not None:
+                    new_label = selected_object["label"]
 
-                if new_label != current_focused_label:
-                    current_focused_label = new_label
-                    dwell_start_time = current_time
-                    dwell_triggered = False
+                    if new_label != current_focused_label:
+                        current_focused_label = new_label
+                        dwell_start_time = current_time
+                        dwell_triggered = False
+                        dwell_message_sent = False
+                    else:
+                        elapsed_dwell_time = current_time - dwell_start_time
+                        if elapsed_dwell_time >= DWELL_THRESHOLD:
+                            if not dwell_triggered:
+                                print(f"Dwell triggered on {current_focused_label} after {elapsed_dwell_time:.1f} seconds.")
+                            dwell_triggered = True
                 else:
-                    elapsed_dwell_time = current_time - dwell_start_time
-                    if elapsed_dwell_time >= DWELL_THRESHOLD:
-                        if not dwell_triggered:
-                            print(f"Dwell triggered on {current_focused_label} after {elapsed_dwell_time:.1f} seconds.")
-                        dwell_triggered = True
-            else:
-                # No object selected --> reset
+                    # No object selected --> reset
+                    current_focused_label = None
+                    dwell_start_time = None
+                    dwell_triggered = False
+                    dwell_message_sent = False
+
+            elif not is_fixating:
+                # Reset dwell filter when not fixating
                 current_focused_label = None
                 dwell_start_time = None
                 dwell_triggered = False
+                dwell_message_sent = False
 
             # Draw detections
             for detection in detections:
@@ -206,14 +218,27 @@ def main():
 
                     # Send UDP data
                     if udp_bridge is not None:
-                        udp_bridge.send_spatial_data(
-                            label=label,
-                            color=color_name,
-                            position=rel_pos_cm if tracker is not None else None,
-                            tvec=tvec if tracker is not None else None,
-                            rvec=rvec if tracker is not None else None,
-                            gaze_point=gaze
-                        )
+                        if FEEDBACK == "selective":
+                            if not dwell_message_sent:
+                                udp_bridge.send_spatial_data(
+                                    label=label,
+                                    color=color_name,
+                                    position=rel_pos_cm if tracker is not None else None,
+                                    tvec=tvec if tracker is not None else None,
+                                    rvec=rvec if tracker is not None else None,
+                                    gaze_point=gaze
+                                )
+                                dwell_message_sent = True
+
+                        else:  
+                            udp_bridge.send_spatial_data(
+                                label=label,
+                                color=color_name,
+                                position=rel_pos_cm if tracker is not None else None,
+                                tvec=tvec if tracker is not None else None,
+                                rvec=rvec if tracker is not None else None,
+                                gaze_point=gaze
+                            )
 
                 else:
                     color = (100, 0, 0)  # Blue for non-focused
@@ -248,15 +273,23 @@ def main():
 
             # Recording text on display
             if MODE == "live":
-                recording_text = "Recording ..." if is_recording else "Press R to start recording."
+                recording_text = "Recording ..." if is_recording else "Press 'R' to start recording."
                 recording_color = (0, 0, 255) if is_recording else (255, 255, 255)
                 cv2.putText(frame, recording_text, (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.7, recording_color, 2)
+
+            feedback_text = f"Feedback mode: {FEEDBACK.capitalize()} (Press 'M' to toggle.)"
+            cv2.putText(frame, feedback_text, (20, 75), cv2.FONT_HERSHEY_SIMPLEX, 0.7, recording_color, 2)
+            
             cv2.imshow("Gaze + Object Detection", frame)
 
             # Input: Start/stop recording and quit
             key = cv2.waitKey(1) & 0xFF
 
-            if key == ord('r') and MODE == "live":
+            if key in (ord('M'), ord('m')):
+                FEEDBACK = "selective" if FEEDBACK == "continuous" else "continuous"
+                print(f"Feedback mode switched to: {FEEDBACK}")
+
+            elif key == ord('r') and MODE == "live":
                 if not is_recording:
                     client.device.recording_start()
                     is_recording = True

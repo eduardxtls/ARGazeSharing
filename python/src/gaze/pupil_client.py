@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 import cv2
 import json
-
 from pupil_labs.realtime_api.simple import discover_one_device
 
 
@@ -17,7 +16,6 @@ class PupilClient:
     def connect(self):
         while self.device is None:
             print("Searching for Pupil Labs device...\n")
-
             device = discover_one_device(max_search_duration_seconds=10.0)
 
             if device:

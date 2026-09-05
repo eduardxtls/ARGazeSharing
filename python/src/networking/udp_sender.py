@@ -9,10 +9,8 @@ class UDPSender:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def send_spatial_data(self, label, color, position, tvec, rvec, gaze_point):
-        """
-        Sends combined Vision + Spatial + Gaze
-        """
         try:
+            # Most data unused in current version
             data = {
                 "type": "detection",
                 "label": str(label) if label else "None",

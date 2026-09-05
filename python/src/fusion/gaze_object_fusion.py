@@ -66,5 +66,5 @@ class GazeObjectFusion:
             return None
         """
 
-        # Check for threshold (50 pixels)
+        # Check for threshold (now: 50 pixels)
         return closest_object if min_distance < 50 else None
