@@ -14,14 +14,14 @@ MODE = "live"  # Options: "live", "replay"
 
 def main():
     # Vision model selection
-    model = YOLO("..\models\yolo12n.pt")
+    model = YOLO("models/yolo11s_ingredients.pt")
 
     if MODE == "live":
         client = PupilClient()
         client.connect()
     else:
-        video_path = r"C:\Users\talos\Downloads\02_Belisarius Brown\02_Belisarius Brown\2024-03-13_19-43-27-92efb037\5ab15f0b_0.0-389.913.mp4"
-        gaze_csv_path = r"C:\Users\talos\Downloads\02_Belisarius Brown\02_Belisarius Brown\2024-03-13_19-43-27-92efb037\gaze.csv"
+        video_path = r""
+        gaze_csv_path = r""
 
         client = ReplayPupilClient(video_path, gaze_csv_path)
 
@@ -39,7 +39,7 @@ def main():
         tracker = None  # No tracking in replay mode
 
     # Create UDP bridge
-    udp_bridge = UDPSender(ip="192.168.1.XX", port=8080)
+    udp_bridge = UDPSender(ip="127.0.0.1", port=8080)
 
     # Recording
     is_recording = False
