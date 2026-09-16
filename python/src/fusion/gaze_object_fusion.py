@@ -42,29 +42,5 @@ class GazeObjectFusion:
                 min_distance = dist
                 closest_object = detection
 
-        # Older code
-        """
-        # Initiate search parameters
-        closest_object = None
-        min_distance = float('inf')
-
-        # Iterate through detections to find the closest one to the gaze point
-        for detection in detections:
-            x1, y1, x2, y2 = detection["bbox"]
-
-            center_x = (x1 + x2) // 2
-            center_y = (y1 + y2) // 2
-
-            # Euclidean distance between gaze point and object center
-            distance = math.sqrt((gaze_x - center_x) ** 2 + (gaze_y - center_y) ** 2)
-
-            if distance < min_distance:
-                min_distance = distance
-                closest_object = detection
-
-        if min_distance > 50:  # Threshold to filter out objects that are too far
-            return None
-        """
-
         # Check for threshold (now: 50 pixels)
         return closest_object if min_distance < 50 else None

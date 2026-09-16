@@ -1,9 +1,8 @@
 import cv2
 from ultralytics import YOLO
 
-model = YOLO(r"D:\Masterarbeit\TIK\Seeing-Through-Others-Eyes\python\models\yolo11s_ingredients.onnx")
+model = YOLO("models/yolo11s_ingredients.pt")
 
-# Connect to webcam
 cap = cv2.VideoCapture(0)
 
 if not cap.isOpened():

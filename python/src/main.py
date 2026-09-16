@@ -28,7 +28,7 @@ def main():
     global FEEDBACK
 
     # Vision model selection
-    model = YOLO(r"D:\Masterarbeit\TIK\Seeing-Through-Others-Eyes\python\models\ingredients.pt")
+    model = YOLO("models/yolo11s_ingredients.pt")
 
     # Object recognition parameters
     AI_UPDATE_INTERVAL = 0.2
@@ -61,7 +61,7 @@ def main():
 
     # Recording
     is_recording = False
-    save_local_video = True
+    save_local_video = False
     video_writer = None
     target_fps = 30.0
     frame_interval = 1.0 / target_fps

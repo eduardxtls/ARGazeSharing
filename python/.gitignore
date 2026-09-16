@@ -5,7 +5,7 @@
 *.weights
 runs/
 .ultralytics/
-models/
+!yolo11s_ingredients.pt
 
 # Other Data 
 *.mp4

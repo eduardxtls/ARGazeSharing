@@ -100,7 +100,8 @@ class ReplayPupilClient:
         }
     
     def get_calibration(self):
-        with open(r"C:\Users\talos\Downloads\02_Belisarius Brown\02_Belisarius Brown\2024-03-13_19-43-27-92efb037\scene_camera.json") as f:
+        path = r"" # Path to calibration JSON
+        with open(path) as f:
             calib = json.load(f)
 
         camera_matrix = np.array(calib["camera_matrix"])

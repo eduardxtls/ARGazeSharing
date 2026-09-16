@@ -2,9 +2,8 @@ import socket
 import json
 from nicegui import ui
 
-# UDP confi
-UNITY_IP = "10.175.192.199" 
-# UNITY_IP = "127.0.0.1" 
+# UDP config
+UNITY_IP = "127.0.0.1"
 UNITY_PORT = 8080
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
